@@ -1,0 +1,5 @@
+<HBox opaque='1'>
+	<Button name="quitButton" text="Quit"/>
+	<Button name="aboutButton" text="About"/>
+	<Button name="optionsButton" text="Options"/>
+</HBox>

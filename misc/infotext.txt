@@ -1,0 +1,15 @@
+Keybindings:
+--------------
+- ESC = Quit techdemo
+
+- C = Toggles coordinates on / off
+- F = Enable/Disable fog of war
+- O = Rotate main camera
+- P = Make screenshot
+- R = Reload map (useful for map editing)
+- S = Second camera on / off
+- T = Toggles grid on / off
+
+- CTRL + MouseWheelUp = Zoom in
+- CTRL + MouseWheelDown = Zoom out
+- CTRL + 0, CTRL + Num0 = Reset zoom

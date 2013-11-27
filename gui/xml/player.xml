@@ -1,0 +1,9 @@
+<Container size="100,100" position="10,20" opaque="0" border_size="0">
+	<!-- <Icon name="background_hud1" helptext="You" image="gui/images/hud_boy.png" /> -->
+	<ImageButton name="face"
+		position="5,5"
+		is_focusable="1"
+		up_image="gui/images/hud_boy.png"
+		down_image="gui/images/hud_boy.png"
+		hover_image="gui/images/hud_boy.png" />
+</Container>
