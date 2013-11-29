@@ -1,9 +1,12 @@
 from fife import fife
 from code.common.common import ProgrammingError
-from agents.hero import Hero
-from agents.girl import Girl
-from agents.beekeeper import Beekeeper
-from agents.agent import create_anonymous_agents
+from hero import Hero
+from girl import Girl
+from beekeeper import Beekeeper
+from agent import create_anonymous_agents
+from fife.extensions.fife_settings import Setting
+
+TDS = Setting(app_name="rio_de_hola")
 
 class AgentManager():
 
@@ -23,15 +26,16 @@ class AgentManager():
         to the python agents for later reference.
         """
         self.agentlayer = self.world.map.getLayer('TechdemoMapGroundObjectLayer')
-        self.hero = Hero(TDS, self.world.model, 'PC', self.world.agentlayer)
-        self.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
+        self.world.agentlayer = self.agentlayer
+        self.hero = Hero(TDS, self.world.model, 'PC', self.agentlayer)
+        self.world.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
         self.hero.start()
 
-        self.girl = Girl(TDS, self.world.model, 'NPC:girl', self.world.agentlayer)
-        self.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
+        self.girl = Girl(TDS, self.world.model, 'NPC:girl', self.agentlayer)
+        self.world.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
         self.girl.start()
 
-        self.beekeepers = create_anonymous_agents(TDS, self.world.model, 'beekeeper', self.world.agentlayer, Beekeeper)
+        self.beekeepers = create_anonymous_agents(TDS, self.world.model, 'beekeeper', self.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
             self.world.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
@@ -46,8 +50,8 @@ class AgentManager():
 
     def getActiveAgentLocation(self):
         if self.player == 0:
-            return self.hero.getLocationRef()
-        return self.girl.getLocationRef()
+            return self.hero.agent.getLocation()
+        return self.girl.agent.getLocation()
 
     def talk(self, instance):
         self.hero.talk(instance.getLocationRef())

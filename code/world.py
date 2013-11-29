@@ -231,7 +231,7 @@ class World(EventListenerBase):
         # Set up the second camera
         # NOTE: We need to explicitly call setLocation, there's a bit of a messup in the Camera code.
         self.cameras['small'].setLocation(self.agentManager.getActiveAgentLocation())
-        self.cameras['small'].attach(self.agentManager.getActiveAgent())
+        self.cameras['small'].attach(self.agentManager.getActiveAgent().agent)
         '''self.cameras['small'].setLocation(self.hero.agent.getLocation())
         self.cameras['small'].attach(self.girl.agent)'''
         self.cameras['small'].setOverlayColor(100,0,0,100)
