@@ -34,6 +34,7 @@ from agents.hero import Hero
 from agents.girl import Girl
 from agents.beekeeper import Beekeeper
 from agents.agent import create_anonymous_agents
+from agents.agent_manager import AgentManager
 from fife.extensions.fife_settings import Setting
 
 TDS = Setting(app_name="rio_de_hola")
@@ -69,7 +70,8 @@ class World(EventListenerBase):
         self.soundmanager = SoundManager(self.engine)
         self.music = None
 
-        self.player = 0
+        self.agentManager = AgentManager()
+        
 
     def show_instancemenu(self, clickpoint, instance):
         """
@@ -87,7 +89,7 @@ class World(EventListenerBase):
 
         # Add the buttons according to circumstances.
         self.instancemenu.addChild(self.dynamic_widgets['inspectButton'])
-        target_distance = self.hero.agent.getLocationRef().getLayerDistanceTo(instance.getLocationRef())
+        target_distance = self.agentManager.getHero().agent.getLocationRef().getLayerDistanceTo(instance.getLocationRef())
         if target_distance > 3.0:
             self.instancemenu.addChild(self.dynamic_widgets['moveButton'])
         else:
@@ -130,7 +132,8 @@ class World(EventListenerBase):
             
         self.map, self.agentlayer = None, None
         self.cameras = {}
-        self.hero, self.girl, self.clouds, self.beekeepers = None, None, [], []
+        self.agentManager.reset()
+        self.clouds, self.beekeepers = [], []
         self.cur_cam2_x, self.initial_cam2_x, self.cam2_scrolling_right = 0, 0, True
         self.target_rotation = 0
         self.instance_to_agent = {}
@@ -150,35 +153,12 @@ class World(EventListenerBase):
         if loader.isLoadable(filename):
             self.map = loader.load(filename)
 
-        self.initAgents()
+        self.agentManager.initAgents()
         self.initCameras()
 
         #Set background color
         self.engine.getRenderBackend().setBackgroundColor(80,80,255)
 
-    def initAgents(self):
-        """
-        Setup agents.
-
-        For this techdemo we have a very simple 'active things on the map' model,
-        which is called agents. All rio maps will have a separate layer for them.
-
-        Note that we keep a mapping from map instances (C++ model of stuff on the map)
-        to the python agents for later reference.
-        """
-        self.agentlayer = self.map.getLayer('TechdemoMapGroundObjectLayer')
-        self.hero = Hero(TDS, self.model, 'PC', self.agentlayer)
-        self.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
-        self.hero.start()
-
-        self.girl = Girl(TDS, self.model, 'NPC:girl', self.agentlayer)
-        self.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
-        self.girl.start()
-
-        self.beekeepers = create_anonymous_agents(TDS, self.model, 'beekeeper', self.agentlayer, Beekeeper)
-        for beekeeper in self.beekeepers:
-            self.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
-            beekeeper.start()
         
     def initCameras(self):
         """
@@ -197,7 +177,7 @@ class World(EventListenerBase):
             self.cameras[camera_id] = cam
             cam.resetRenderers()
             
-        self.cameras['main'].attach(self.hero.agent)
+        self.cameras['main'].attach(self.agentManager.getHero().agent)
 
         # Floating text renderers currntly only support one font.
         # ... so we set that up.
@@ -250,8 +230,10 @@ class World(EventListenerBase):
         
         # Set up the second camera
         # NOTE: We need to explicitly call setLocation, there's a bit of a messup in the Camera code.
-        self.cameras['small'].setLocation(self.hero.agent.getLocation())
-        self.cameras['small'].attach(self.girl.agent)
+        self.cameras['small'].setLocation(self.agentManager.getActiveAgentLocation())
+        self.cameras['small'].attach(self.agentManager.getActiveAgent())
+        '''self.cameras['small'].setLocation(self.hero.agent.getLocation())
+        self.cameras['small'].attach(self.girl.agent)'''
         self.cameras['small'].setOverlayColor(100,0,0,100)
         self.cameras['small'].setEnabled(False)
 
@@ -339,15 +321,10 @@ class World(EventListenerBase):
         if evt.isConsumedByWidgets():
             return
 
-        if (self.player == 0):
-            player_obj = self.hero
-        else:
-            player_obj = self.girl
-
         clickpoint = fife.ScreenPoint(evt.getX(), evt.getY())
         if (evt.getButton() == fife.MouseEvent.LEFT):
             self.hide_instancemenu()
-            player_obj.run( self.getLocationAt(clickpoint) )
+            self.agentManager.getActiveAgent().run(self.getLocationAt(clickpoint))
 
         if (evt.getButton() == fife.MouseEvent.RIGHT):
             instances = self.getInstancesAt(clickpoint)
@@ -382,10 +359,10 @@ class World(EventListenerBase):
             renderer.removeAll("girl_simple_light")
 
             if self.lightmodel == 1:
-                node = fife.RendererNode(self.hero.agent)
+                node = fife.RendererNode(self.agentManager.getHero())
                 renderer.addSimpleLight("hero_simple_light", node, self.light_sources, 64, 32, 1, 1, 255, 255, 255)
 
-                node = fife.RendererNode(self.girl.agent)       
+                node = fife.RendererNode(self.agentManager.getGirl())
                 renderer.addSimpleLight("girl_simple_light", node, self.light_sources, 64, 32, 1, 1, 255, 255, 255)
 
                 for beekeeper in self.beekeepers:
@@ -403,22 +380,24 @@ class World(EventListenerBase):
     # Callbacks from the popupmenu
     def onMoveButtonPress(self):
         self.hide_instancemenu()
-        self.hero.run(self.instancemenu.instance.getLocationRef())
+
+        self.agentManager.run(self.instancemenu.instance.getLocationRef())
 
     def onTalkButtonPress(self):
         self.hide_instancemenu()
         instance = self.instancemenu.instance
-        self.hero.talk(instance.getLocationRef())
+        self.agentManager.talk(instance)
+        '''self.hero.talk(instance.getLocationRef())
         if instance.getObject().getId() == 'beekeeper':
             beekeeperTexts = TDS.get("rio", "beekeeperTexts")
             instance.say(random.choice(beekeeperTexts), 5000)
         if instance.getObject().getId() == 'girl':
             girlTexts = TDS.get("rio", "girlTexts")
-            instance.say(random.choice(girlTexts), 5000)
+            instance.say(random.choice(girlTexts), 5000)'''
 
     def onKickButtonPress(self):
         self.hide_instancemenu()
-        self.hero.kick(self.instancemenu.instance.getLocationRef())
+        self.agentManager.kick(self.instancemenu.instance.getLocationRef())
         self.instancemenu.instance.say('Hey!', 1000)
 
     def onInspectButtonPress(self):
@@ -429,7 +408,7 @@ class World(EventListenerBase):
             # saytext.append('This is %s,' % inst.getId())
         # saytext.append(' ID %s and' % inst.getFifeId())
         saytext.append('%s' % inst.getObject().getId())
-        self.hero.agent.say('\n'.join(saytext), 3500)
+        self.agentManager.getHero().agent.say('\n'.join(saytext), 3500)
 
     def pump(self):
         """

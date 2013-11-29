@@ -58,7 +58,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         self.aboutWindow = None
 
         self.rootpanel = pychan.loadXML('gui/xml/rootpanel.xml')
-        self.rootpanel.mapEvents({ 
+        self.rootpanel.mapEvents({
             'quitButton' : self.onQuitButtonPress,
             'aboutButton' : self.onAboutButtonPress,
             'optionsButton' : TDS.showSettingsDialog
@@ -70,8 +70,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
             'face' : self.onFacePressed
         })
         self.character_gui.show()
-        self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png']
-        self.player = 0
+        
 
     def keyPressed(self, evt):
         print ">>>>>> run.py --> keyPressed ", evt.getKey().getValue()
@@ -105,22 +104,8 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         self.aboutWindow.show()
 
     def onFacePressed(self):
-        print "<<<<<<< onFacePressed"
-        self.player = (self.player + 1) % 2
-        self.world.player = self.player
         face_button = self.character_gui.findChild(name="face")
-        face_button.up_image = self.player_faces[self.player]
-        face_button.down_image = self.player_faces[self.player]
-        face_button.hover_image = self.player_faces[self.player]
-        self.world.hero.idle()
-        self.world.girl.idle()
-        self.world.girl.isActive = self.player;
-        if self.player == 0:
-            self.world.cameras['main'].attach(self.world.hero.agent)
-            self.world.cameras['small'].attach(self.world.girl.agent)
-        else:
-            self.world.cameras['main'].attach(self.world.girl.agent)
-            self.world.cameras['small'].attach(self.world.hero.agent)
+        self.world.agentManager.toggleAgent(self.world, face_button)
 
 
 class IslandDemo(PychanApplicationBase):
