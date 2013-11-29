@@ -70,7 +70,7 @@ class World(EventListenerBase):
         self.soundmanager = SoundManager(self.engine)
         self.music = None
 
-        self.agentManager = AgentManager()
+        self.agentManager = AgentManager(self)
         
 
     def show_instancemenu(self, clickpoint, instance):

@@ -1,11 +1,16 @@
 from fife import fife
 from code.common.common import ProgrammingError
+from agents.hero import Hero
+from agents.girl import Girl
+from agents.beekeeper import Beekeeper
+from agents.agent import create_anonymous_agents
 
 class AgentManager():
 
-    def __init__(self):
+    def __init__(self, world):
         self.player = 0
         self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png']
+        self.world = world
 
     def initAgents(self):
         """
@@ -17,18 +22,18 @@ class AgentManager():
         Note that we keep a mapping from map instances (C++ model of stuff on the map)
         to the python agents for later reference.
         """
-        self.agentlayer = self.map.getLayer('TechdemoMapGroundObjectLayer')
-        self.hero = Hero(TDS, self.model, 'PC', self.agentlayer)
+        self.agentlayer = self.world.map.getLayer('TechdemoMapGroundObjectLayer')
+        self.hero = Hero(TDS, self.world.model, 'PC', self.world.agentlayer)
         self.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
         self.hero.start()
 
-        self.girl = Girl(TDS, self.model, 'NPC:girl', self.agentlayer)
+        self.girl = Girl(TDS, self.world.model, 'NPC:girl', self.world.agentlayer)
         self.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
         self.girl.start()
 
-        self.beekeepers = create_anonymous_agents(TDS, self.model, 'beekeeper', self.agentlayer, Beekeeper)
+        self.beekeepers = create_anonymous_agents(TDS, self.world.model, 'beekeeper', self.world.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
-            self.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
+            self.world.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
 
     def reset(self):
