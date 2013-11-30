@@ -34,5 +34,32 @@
 
 MAPFILE=$1
 
+cat $MAPFILE | grep '<i' | grep -o 'o="[A-Za-z0-9:_]*"' | cut -d '"' -f 2 | sort -t':' -k1,1 -k2,1n -s | awk '
+BEGIN {old_name=""; FS=":"}
+{
+	if ($1 == old_name)
+		array_count[$1]++;
+	else {
+		old_name = $1;
+		array_count[$1] = 1;
+		array_type[$1] = 1;
+		old_type = int($2)
+	}
+	if (int($2) != old_type) {
+		array_type[$1]++;
+		old_type = int($2);
+	}
+}
+END {
+	for( i in array_count) {
+       print "#", array_count[i], i, array_type[i];
+	}
+}
+' | sort -t' ' -k2,1nr -k3,1
+
 # Put here your code
+#cat $MAPFILE | grep '<i' | grep -o 'o="[A-Za-z0-9:_]*"' | cut -d '"' -f 2 | cut -d ':' -f 1 | sort | uniq -c | sort -nr | sed "s/^[ ]*//g" > tmp1.out
+#list=$(cut -f 2 -d ' ' tmp1.out)
+#echo $list
+#cat $MAPFILE | grep '<i' | grep -o 'o="[A-Za-z0-9:_]*"' | cut -d '"' -f 2 | sort | uniq > tmp2.out
 

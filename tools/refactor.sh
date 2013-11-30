@@ -10,20 +10,26 @@
 # To test if everything is ok, execute the previous command and then try
 # to run the game. If it works without raining exceptions, it is ok.
 
-OLDNAME=$1
-NEWNAME=$2
+OLDNAME=$(basename $1)
+NEWNAME=$(basename $2)
+DIRPATH=$(dirname $1)
 
 if [ $# -ne 2 ]
 then
-	echo "Use refactor.sh orig_name new_name"
+	echo "Use: refactor.sh original_name new_name"
+	exit
+fi
+if [ "$(dirname $2)" != "." ]
+then
+	echo "new_name cannot contains /"
 	exit
 fi
 
-echo "Renaming $1 to $2"
-echo $(dirname $1) #directory path
-echo $(basename $1) #name of the directory
+echo "Renaming $OLDNAME to $NEWNAME"
 
-grep --color -rE "from $(basename $1)" $(dirname $1)/* | sed "s/from $(basename $1)/from $2/g"
-
-# Put here your code
+for file in $(grep -rl "from $OLDNAME" $DIRPATH/*)
+do
+	sed -i "" "s/from $OLDNAME/from $NEWNAME/g" $file
+done
+mv $1 $DIRPATH/$NEWNAME
 

@@ -21,4 +21,18 @@
 
 # Put here your code
 
+textreset=$(tput sgr0) # reset the foreground colour
+red=$(tput setaf 1)
 
+path=$1
+dirs=$(ls $path/ | sort)
+for dir in $dirs
+do
+	echo -n "${red}$dir:${textreset}"
+	actions=$(grep "action .*id" $path/$dir/*.xml | grep -o 'id *= *".*"' | cut -d '"' -f 2)
+	for a in $actions
+	do
+		echo -n " $a,"
+	done
+	echo ""
+done
