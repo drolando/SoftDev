@@ -79,7 +79,7 @@ class World(EventListenerBase):
         clicked on. The available actions are dynamically added to
         the menu (and mapped to the onXYZ functions).
         """
-        if instance.getFifeId() == self.hero.agent.getFifeId():
+        if instance.getFifeId() == self.agentManager.getHero().agent.getFifeId():
             return
 
         # Create the popup.

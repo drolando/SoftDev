@@ -1,4 +1,5 @@
 from fife import fife
+import math, random
 from code.common.common import ProgrammingError
 from hero import Hero
 from girl import Girl
@@ -39,6 +40,7 @@ class AgentManager():
         for beekeeper in self.beekeepers:
             self.world.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
+        self.active_agent = self.hero
 
     def reset(self):
         self.hero, self.girl = None, None
@@ -74,23 +76,24 @@ class AgentManager():
     def getGirl(self):
         return self.girl
 
-    def toggleAgent(self, world):
+    def toggleAgent(self, world, face_button):
         self.player = (self.player + 1) % 2
         self.world.player = self.player
         
         face_button.up_image = self.player_faces[self.player]
         face_button.down_image = self.player_faces[self.player]
         face_button.hover_image = self.player_faces[self.player]
-        world.hero.idle()
-        world.girl.idle()
-        world.girl.isActive = self.player;
+        self.hero.idle()
+        self.girl.idle()
+        self.girl.isActive = self.player;
         if self.player == 0:
-            world.cameras['main'].attach(world.hero.agent)
-            world.cameras['small'].attach(world.girl.agent)
+            world.cameras['main'].attach(self.hero.agent)
+            world.cameras['small'].attach(self.girl.agent)
+            self.active_agent = self.hero
         else:
-            world.cameras['main'].attach(world.girl.agent)
-            world.cameras['small'].attach(world.hero.agent)
-
+            world.cameras['main'].attach(self.girl.agent)
+            world.cameras['small'].attach(self.hero.agent)
+            self.active_agent = self.girl
 
 
 
