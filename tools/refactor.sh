@@ -29,7 +29,7 @@ echo "Renaming $OLDNAME to $NEWNAME"
 
 for file in $(grep -rl "from $OLDNAME" $DIRPATH/*)
 do
-	sed -i "" "s/from $OLDNAME/from $NEWNAME/g" $file
+	sed -i "s/from $OLDNAME/from $NEWNAME/g" $file
 done
 mv $1 $DIRPATH/$NEWNAME
 
