@@ -317,6 +317,9 @@ class World(EventListenerBase):
         if self.target_rotation != currot:
             self.cameras['main'].setRotation((currot + 5) % 360)
 
+    """ This function is called when the user click one of the mouse's buttons.
+        Send the event immediately to agent_manager instead of use it here???
+    """
     def mousePressed(self, evt):
         if evt.isConsumedByWidgets():
             return
@@ -330,7 +333,8 @@ class World(EventListenerBase):
             instances = self.getInstancesAt(clickpoint)
             print "selected instances on agent layer: ", [i.getObject().getId() for i in instances]
             if instances:
-                self.show_instancemenu(clickpoint, instances[0])
+                self.agentManager.rightButtonClicked(instances)
+                
 
     def mouseMoved(self, evt):
         renderer = fife.InstanceRenderer.getInstance(self.cameras['main'])

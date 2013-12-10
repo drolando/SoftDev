@@ -34,6 +34,7 @@ class Hero(Agent):
 		super(Hero, self).__init__(settings, model, agentName, layer, uniqInMap)
 		self.state = _STATE_NONE
 		self.idlecounter = 1
+		self.HERO_SPEED = 4 * self.settings.get("rio", "TestAgentSpeed")
 
 	def onInstanceActionFinished(self, instance, action):
 		self.idle()
@@ -49,17 +50,10 @@ class Hero(Agent):
 	def onInstanceActionCancelled(self, instance, action):
 		pass
 	
-	def start(self):
-		self.idle()
-
-	def idle(self):
-		self.state = _STATE_IDLE
-		self.agent.actOnce('stand')
-
 	def run(self, location):
 		print "------- run ", location
 		self.state = _STATE_RUN
-		self.agent.move('run', location, 4 * self.settings.get("rio", "TestAgentSpeed"))
+		self.agent.move('run', location, self.HERO_SPEED)
 
 	def kick(self, target):
 		self.state = _STATE_KICK

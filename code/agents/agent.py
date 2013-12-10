@@ -35,6 +35,7 @@ class Agent(fife.InstanceActionListener):
 		if uniqInMap:
 			self.agent = layer.getInstance(agentName)
 			self.agent.addActionListener(self)
+		self.AGENT_SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
 
 	def onInstanceActionFinished(self, instance, action):
 		raise ProgrammingError('No OnActionFinished defined for Agent')
@@ -47,6 +48,17 @@ class Agent(fife.InstanceActionListener):
 
 	def start(self):
 		raise ProgrammingError('No start defined for Agent')
+
+	def start(self):
+        self.idle()
+
+    def idle(self):
+        self.state = _STATE_IDLE
+        self.agent.actOnce('stand')
+
+    def run(self, location):
+        self.state = _STATE_RUN
+        self.agent.move('run', location, self.GIRL_SPEED)
 
 
 def create_anonymous_agents(settings, model, objectName, layer, agentClass):
