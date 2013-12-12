@@ -95,9 +95,9 @@ class AgentManager():
             world.cameras['small'].attach(self.hero.agent)
             self.active_agent = self.girl
 
-    def rightButtonClicked(instances):
+    def rightButtonClicked(self, instances, clickpoint):
         if (self.player == 0):
-            self.show_instancemenu(clickpoint, instances[0])
+            self.world.show_instancemenu(clickpoint, instances[0])
 
 
 

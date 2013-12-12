@@ -333,7 +333,7 @@ class World(EventListenerBase):
             instances = self.getInstancesAt(clickpoint)
             print "selected instances on agent layer: ", [i.getObject().getId() for i in instances]
             if instances:
-                self.agentManager.rightButtonClicked(instances)
+                self.agentManager.rightButtonClicked(instances, clickpoint)
                 
 
     def mouseMoved(self, evt):

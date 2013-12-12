@@ -24,7 +24,10 @@
 from fife import fife
 from code.common.common import ProgrammingError
 
+_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
+
 class Agent(fife.InstanceActionListener):
+	
 	def __init__(self, settings, model, agentName, layer, uniqInMap=True):
 		print ">>>>> agent.py --> __init__"
 		fife.InstanceActionListener.__init__(self)
@@ -50,15 +53,15 @@ class Agent(fife.InstanceActionListener):
 		raise ProgrammingError('No start defined for Agent')
 
 	def start(self):
-        self.idle()
+        	self.idle()
 
-    def idle(self):
-        self.state = _STATE_IDLE
-        self.agent.actOnce('stand')
+	def idle(self):
+        	self.state = _STATE_IDLE
+        	self.agent.actOnce('stand')
 
-    def run(self, location):
-        self.state = _STATE_RUN
-        self.agent.move('run', location, self.GIRL_SPEED)
+	def run(self, location):
+        	self.state = _STATE_RUN
+        	self.agent.move('run', location, self.GIRL_SPEED)
 
 
 def create_anonymous_agents(settings, model, objectName, layer, agentClass):
