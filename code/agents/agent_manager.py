@@ -1,9 +1,11 @@
 from fife import fife
+import math, random
 from code.common.common import ProgrammingError
 from hero import Hero
 from girl import Girl
 from beekeeper import Beekeeper
-from agent import create_anonymous_agents
+from bee import Bee
+#from agent import create_anonymous_agents
 from fife.extensions.fife_settings import Setting
 
 TDS = Setting(app_name="rio_de_hola")
@@ -40,6 +42,18 @@ class AgentManager():
             self.world.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
 
+        '''self.bees = create_anonymous_agents(TDS, self.world.model, 'bee', self.agentlayer, Bee)
+        for bee in self.bees:
+            self.world.instance_to_agent[bee.agent.getFifeId()] = bee
+            bee.start()'''
+        self.bees = []
+        for i in range(1, 8):
+            bee = Bee(TDS, self.world.model, 'NPC:bee:0{}'.format(i), self.agentlayer)
+            self.bees.append(bee)
+            bee.start()
+
+        self.active_agent = self.hero
+
     def reset(self):
         self.hero, self.girl = None, None
 
@@ -74,24 +88,41 @@ class AgentManager():
     def getGirl(self):
         return self.girl
 
-    def toggleAgent(self, world):
+    def toggleAgent(self, world, face_button):
         self.player = (self.player + 1) % 2
         self.world.player = self.player
         
         face_button.up_image = self.player_faces[self.player]
         face_button.down_image = self.player_faces[self.player]
         face_button.hover_image = self.player_faces[self.player]
-        world.hero.idle()
-        world.girl.idle()
-        world.girl.isActive = self.player;
+        self.hero.idle()
+        self.girl.idle()
+        self.girl.isActive = self.player;
         if self.player == 0:
-            world.cameras['main'].attach(world.hero.agent)
-            world.cameras['small'].attach(world.girl.agent)
+            world.cameras['main'].attach(self.hero.agent)
+            world.cameras['small'].attach(self.girl.agent)
+            self.active_agent = self.hero
         else:
-            world.cameras['main'].attach(world.girl.agent)
-            world.cameras['small'].attach(world.hero.agent)
+            world.cameras['main'].attach(self.girl.agent)
+            world.cameras['small'].attach(self.hero.agent)
+            self.active_agent = self.girl
+
+    def rightButtonClicked(self, instances, clickpoint):
+        if (self.player == 0):
+            self.world.show_instancemenu(clickpoint, instances[0])
 
 
 
-
-
+def create_anonymous_agents(settings, model, objectName, layer, agentClass):
+    print ">>>>>> agent.py --> create_anonymous_agents"
+    agents = []
+    instances = [a for a in layer.getInstances() if a.getObject().getId() == objectName]
+    i = 0
+    for a in instances:
+        agentName = '%s:i:%d' % (objectName, i)
+        i += 1
+        agent = agentClass(settings, model, agentName, layer, False)
+        agent.agent = a
+        a.addActionListener(agent)
+        agents.append(agent)
+    return agents

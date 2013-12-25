@@ -24,9 +24,11 @@
 from fife import fife
 from code.common.common import ProgrammingError
 
+_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
+
 class Agent(fife.InstanceActionListener):
+	
 	def __init__(self, settings, model, agentName, layer, uniqInMap=True):
-		print ">>>>> agent.py --> __init__"
 		fife.InstanceActionListener.__init__(self)
 		self.settings = settings
 		self.model = model
@@ -35,6 +37,9 @@ class Agent(fife.InstanceActionListener):
 		if uniqInMap:
 			self.agent = layer.getInstance(agentName)
 			self.agent.addActionListener(self)
+			print '------------------ Agent ' + agentName + ' -------------------- '
+			print '------------------ ', self.agent
+		self.AGENT_SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
 
 	def onInstanceActionFinished(self, instance, action):
 		raise ProgrammingError('No OnActionFinished defined for Agent')
@@ -46,19 +51,12 @@ class Agent(fife.InstanceActionListener):
 		raise ProgrammingError('No OnActionFrame defined for Agent')	
 
 	def start(self):
-		raise ProgrammingError('No start defined for Agent')
+		self.idle()
 
+	def idle(self):
+		self.state = _STATE_IDLE
+		self.agent.actOnce('stand')
 
-def create_anonymous_agents(settings, model, objectName, layer, agentClass):
-	print ">>>>>> agent.py --> create_anonymous_agents"
-	agents = []
-	instances = [a for a in layer.getInstances() if a.getObject().getId() == objectName]
-	i = 0
-	for a in instances:
-		agentName = '%s:i:%d' % (objectName, i)
-		i += 1
-		agent = agentClass(settings, model, agentName, layer, False)
-		agent.agent = a
-		a.addActionListener(agent)
-		agents.append(agent)
-	return agents
+	def run(self, location):
+		self.state = _STATE_RUN
+		self.agent.move('run', location, self.GIRL_SPEED)
