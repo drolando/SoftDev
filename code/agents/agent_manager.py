@@ -4,7 +4,8 @@ from code.common.common import ProgrammingError
 from hero import Hero
 from girl import Girl
 from beekeeper import Beekeeper
-from agent import create_anonymous_agents
+from bee import Bee
+#from agent import create_anonymous_agents
 from fife.extensions.fife_settings import Setting
 
 TDS = Setting(app_name="rio_de_hola")
@@ -40,6 +41,17 @@ class AgentManager():
         for beekeeper in self.beekeepers:
             self.world.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
+
+        '''self.bees = create_anonymous_agents(TDS, self.world.model, 'bee', self.agentlayer, Bee)
+        for bee in self.bees:
+            self.world.instance_to_agent[bee.agent.getFifeId()] = bee
+            bee.start()'''
+        self.bees = []
+        for i in range(1, 8):
+            bee = Bee(TDS, self.world.model, 'NPC:bee:0{}'.format(i), self.agentlayer)
+            self.bees.append(bee)
+            bee.start()
+
         self.active_agent = self.hero
 
     def reset(self):
@@ -101,4 +113,16 @@ class AgentManager():
 
 
 
-
+def create_anonymous_agents(settings, model, objectName, layer, agentClass):
+    print ">>>>>> agent.py --> create_anonymous_agents"
+    agents = []
+    instances = [a for a in layer.getInstances() if a.getObject().getId() == objectName]
+    i = 0
+    for a in instances:
+        agentName = '%s:i:%d' % (objectName, i)
+        i += 1
+        agent = agentClass(settings, model, agentName, layer, False)
+        agent.agent = a
+        a.addActionListener(agent)
+        agents.append(agent)
+    return agents
