@@ -29,9 +29,9 @@ from fife.extensions.fife_settings import Setting
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW = 0, 1, 2, 3
 
-class Girl(Agent):
+class Warrior(Agent):
     def __init__(self, settings, model, agentName, layer, uniqInMap=True):
-        super(Girl, self).__init__(settings, model, agentName, layer, uniqInMap)
+        super(Warrior, self).__init__(settings, model, agentName, layer, uniqInMap)
         self.state = _STATE_NONE
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0

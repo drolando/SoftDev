@@ -6018,6 +6018,7 @@
 			<i x="33.0" o="bushes:06" z="0.0" y="-33.0" r="0"></i>
 			<i x="-14.0" o="boy" y="-13.0" r="0" id="PC" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 			<i x="8.0" o="girl" y="2.0" r="0" id="NPC:girl" z="0.0"></i>
+			<i x="-8.0" o="warrior" y="-2.0" r="0" id="NPC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 
 			<i x="-17.0" o="bee" z="0.0" y="-9.0" r="180" id="NPC:bee:01"></i>
 
