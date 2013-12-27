@@ -90,7 +90,6 @@ class AgentManager():
 
     def toggleAgent(self, world, face_button):
         self.player = (self.player + 1) % 2
-        self.world.player = self.player
         
         face_button.up_image = self.player_faces[self.player]
         face_button.down_image = self.player_faces[self.player]
@@ -109,7 +108,7 @@ class AgentManager():
 
     def rightButtonClicked(self, instances, clickpoint):
         if (self.player == 0):
-            self.world.show_instancemenu(clickpoint, instances[0])
+            self.world.game.dialog.show_instancemenu(clickpoint, instances[0])
 
 
 

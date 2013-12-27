@@ -35,6 +35,7 @@ from agents.girl import Girl
 from agents.beekeeper import Beekeeper
 from agents.agent_manager import create_anonymous_agents
 from agents.agent_manager import AgentManager
+from game import Game
 from fife.extensions.fife_settings import Setting
 
 TDS = Setting(app_name="rio_de_hola")
@@ -60,7 +61,6 @@ class World(EventListenerBase):
         self.filename = ''
         self.pump_ctr = 0 # for testing purposis
         self.ctrldown = False
-        self.instancemenu = None
         self.instance_to_agent = {}
         self.dynamic_widgets = {}
 
@@ -71,57 +71,8 @@ class World(EventListenerBase):
         self.music = None
 
         self.agentManager = AgentManager(self)
+        self.game = Game(self)
         
-
-    def show_instancemenu(self, clickpoint, instance):
-        """
-        Build and show a popupmenu for an instance that the player
-        clicked on. The available actions are dynamically added to
-        the menu (and mapped to the onXYZ functions).
-        """
-        if instance.getFifeId() == self.agentManager.getHero().agent.getFifeId():
-            return
-
-        # Create the popup.
-        self.build_instancemenu()
-        self.instancemenu.clickpoint = clickpoint
-        self.instancemenu.instance = instance
-
-        # Add the buttons according to circumstances.
-        self.instancemenu.addChild(self.dynamic_widgets['inspectButton'])
-        target_distance = self.agentManager.getHero().agent.getLocationRef().getLayerDistanceTo(instance.getLocationRef())
-        if target_distance > 3.0:
-            self.instancemenu.addChild(self.dynamic_widgets['moveButton'])
-        else:
-            if self.instance_to_agent.has_key(instance.getFifeId()):
-                self.instancemenu.addChild(self.dynamic_widgets['talkButton'])
-                self.instancemenu.addChild(self.dynamic_widgets['kickButton'])
-        # And show it :)
-        self.instancemenu.position = (clickpoint.x, clickpoint.y)
-        self.instancemenu.show()
-
-    def build_instancemenu(self):
-        """
-        Just loads the menu from an XML file
-        and hooks the events up.
-        The buttons are removed and later re-added if appropiate.
-        """
-        self.hide_instancemenu()
-        dynamicbuttons = ('moveButton', 'talkButton', 'kickButton', 'inspectButton')
-        self.instancemenu = pychan.loadXML('gui/xml/instancemenu.xml')
-        self.instancemenu.mapEvents({
-            'moveButton' : self.onMoveButtonPress,
-            'talkButton' : self.onTalkButtonPress,
-            'kickButton' : self.onKickButtonPress,
-            'inspectButton' : self.onInspectButtonPress,
-        })
-        for btn in dynamicbuttons:
-            self.dynamic_widgets[btn] = self.instancemenu.findChild(name=btn)
-        self.instancemenu.removeAllChildren()
-
-    def hide_instancemenu(self):
-        if self.instancemenu:
-            self.instancemenu.hide()
 
     def reset(self):
         """
@@ -326,14 +277,11 @@ class World(EventListenerBase):
 
         clickpoint = fife.ScreenPoint(evt.getX(), evt.getY())
         if (evt.getButton() == fife.MouseEvent.LEFT):
-            self.hide_instancemenu()
-            self.agentManager.getActiveAgent().run(self.getLocationAt(clickpoint))
+            self.game.leftClick(self.getLocationAt(clickpoint))
 
         if (evt.getButton() == fife.MouseEvent.RIGHT):
             instances = self.getInstancesAt(clickpoint)
-            print "selected instances on agent layer: ", [i.getObject().getId() for i in instances]
-            if instances:
-                self.agentManager.rightButtonClicked(instances, clickpoint)
+            self.game.rightClick(instances, clickpoint)
                 
 
     def mouseMoved(self, evt):
@@ -380,39 +328,6 @@ class World(EventListenerBase):
         except Exception, e:
             result = str(e)
         return result
-
-    # Callbacks from the popupmenu
-    def onMoveButtonPress(self):
-        self.hide_instancemenu()
-
-        self.agentManager.run(self.instancemenu.instance.getLocationRef())
-
-    def onTalkButtonPress(self):
-        self.hide_instancemenu()
-        instance = self.instancemenu.instance
-        self.agentManager.talk(instance)
-        '''self.hero.talk(instance.getLocationRef())
-        if instance.getObject().getId() == 'beekeeper':
-            beekeeperTexts = TDS.get("rio", "beekeeperTexts")
-            instance.say(random.choice(beekeeperTexts), 5000)
-        if instance.getObject().getId() == 'girl':
-            girlTexts = TDS.get("rio", "girlTexts")
-            instance.say(random.choice(girlTexts), 5000)'''
-
-    def onKickButtonPress(self):
-        self.hide_instancemenu()
-        self.agentManager.kick(self.instancemenu.instance.getLocationRef())
-        self.instancemenu.instance.say('Hey!', 1000)
-
-    def onInspectButtonPress(self):
-        self.hide_instancemenu()
-        inst = self.instancemenu.instance
-        saytext = []
-        # if inst.getId():
-            # saytext.append('This is %s,' % inst.getId())
-        # saytext.append(' ID %s and' % inst.getFifeId())
-        saytext.append('%s' % inst.getObject().getId())
-        self.agentManager.getHero().agent.say('\n'.join(saytext), 3500)
 
     def pump(self):
         """

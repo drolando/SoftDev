@@ -36,6 +36,7 @@ print "Using the FIFE python module found here: ", os.path.dirname(fife.__file__
 from fife.extensions import *
 from code import world
 from code.common import eventlistenerbase
+from code.game import Game
 from fife.extensions import pychan
 from fife.extensions.pychan.pychanbasicapplication import PychanApplicationBase
 from fife.extensions.pychan.fife_pychansettings import FifePychanSettings
@@ -70,6 +71,11 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
             'face' : self.onFacePressed
         })
         self.character_gui.show()
+
+        self.game = self.world.game
+        self.game.setApplicationListener(self)
+        
+        self.game.event('start')
         
 
     def keyPressed(self, evt):
