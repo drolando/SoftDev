@@ -37,8 +37,6 @@ class Agent(fife.InstanceActionListener):
 		if uniqInMap:
 			self.agent = layer.getInstance(agentName)
 			self.agent.addActionListener(self)
-			print '------------------ Agent ' + agentName + ' -------------------- '
-			print '------------------ ', self.agent
 		self.AGENT_SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
 
 	def onInstanceActionFinished(self, instance, action):
@@ -60,3 +58,6 @@ class Agent(fife.InstanceActionListener):
 	def run(self, location):
 		self.state = _STATE_RUN
 		self.agent.move('run', location, self.GIRL_SPEED)
+
+	def onKick(self):
+		self.agent.say('Hey!', 1000)

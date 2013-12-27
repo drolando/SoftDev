@@ -2,14 +2,14 @@
 <object blocking="1" id="bee" namespace="http://www.fifengine.net/xml/rio_de_hola" static="0">
 	<action id="attack">
 		<animation atlas="attack.png" height="96" width="96">
-			<direction delay="130" dir="0" frames="8"/>
-			<direction delay="130" dir="45" frames="8"/>
-			<direction delay="130" dir="90" frames="8"/>
-			<direction delay="130" dir="135" frames="8"/>
-			<direction delay="130" dir="180" frames="8"/>
-			<direction delay="130" dir="225" frames="8"/>
-			<direction delay="130" dir="270" frames="8"/>
-			<direction delay="130" dir="315" frames="8"/>
+			<direction delay="130" dir="0" frames="6"/>
+			<direction delay="130" dir="45" frames="6"/>
+			<direction delay="130" dir="90" frames="6"/>
+			<direction delay="130" dir="135" frames="6"/>
+			<direction delay="130" dir="180" frames="6"/>
+			<direction delay="130" dir="225" frames="6"/>
+			<direction delay="130" dir="270" frames="6"/>
+			<direction delay="130" dir="315" frames="6"/>
 		</animation>
 	</action>
 	<action id="fall">
