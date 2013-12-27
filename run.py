@@ -111,7 +111,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
 
     def onFacePressed(self):
         face_button = self.character_gui.findChild(name="face")
-        self.world.agentManager.toggleAgent(self.world, face_button)
+        self.game.onFacePressed(face_button)
 
 
 class IslandDemo(PychanApplicationBase):

@@ -88,7 +88,7 @@ class AgentManager():
     def getGirl(self):
         return self.girl
 
-    def toggleAgent(self, world, face_button):
+    def toggleAgent(self, face_button):
         self.player = (self.player + 1) % 2
         
         face_button.up_image = self.player_faces[self.player]
@@ -98,12 +98,12 @@ class AgentManager():
         self.girl.idle()
         self.girl.isActive = self.player;
         if self.player == 0:
-            world.cameras['main'].attach(self.hero.agent)
-            world.cameras['small'].attach(self.girl.agent)
+            self.world.cameras['main'].attach(self.hero.agent)
+            self.world.cameras['small'].attach(self.girl.agent)
             self.active_agent = self.hero
         else:
-            world.cameras['main'].attach(self.girl.agent)
-            world.cameras['small'].attach(self.hero.agent)
+            self.world.cameras['main'].attach(self.girl.agent)
+            self.world.cameras['small'].attach(self.hero.agent)
             self.active_agent = self.girl
 
     def rightButtonClicked(self, instances, clickpoint):
