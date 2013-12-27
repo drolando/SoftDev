@@ -3,13 +3,16 @@ from fife.extensions import *
 
 from dialog import Dialog
 
+STATE_START, STATE_LV1, STATE_END = xrange(3)
+
 class Game():
     def __init__(self, world):
         self.applicationListener = None
         self.world = world
         self.agentManager = self.world.agentManager
         self.dialog = Dialog(self)
-
+        self.state = STATE_START
+        self.lives = 3
 
     def setApplicationListener(self, applicationListener):
         self.applicationListener = applicationListener
