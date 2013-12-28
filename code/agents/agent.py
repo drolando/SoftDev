@@ -22,6 +22,7 @@
 # ####################################################################
 
 from fife import fife
+from fife.fife import IAnimationLoader
 from code.common.common import ProgrammingError
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
@@ -37,16 +38,14 @@ class Agent(fife.InstanceActionListener):
 		if uniqInMap:
 			self.agent = layer.getInstance(agentName)
 			self.agent.addActionListener(self)
-			print '------------------ Agent ' + agentName + ' -------------------- '
-			print '------------------ ', self.agent
-		self.AGENT_SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
+		self.SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
 
 	def onInstanceActionFinished(self, instance, action):
 		raise ProgrammingError('No OnActionFinished defined for Agent')
 
 	def onInstanceActionCancelled(self, instance, action):
 		raise ProgrammingError('No OnActionFinished defined for Agent')
-	
+
 	def onInstanceActionFrame(self, instance, action, frame):
 		raise ProgrammingError('No OnActionFrame defined for Agent')	
 
@@ -59,4 +58,4 @@ class Agent(fife.InstanceActionListener):
 
 	def run(self, location):
 		self.state = _STATE_RUN
-		self.agent.move('run', location, self.GIRL_SPEED)
+		self.agent.move('run', location, self.SPEED)

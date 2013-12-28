@@ -6,6 +6,7 @@ from girl import Girl
 from priest import Priest
 from beekeeper import Beekeeper
 from bee import Bee
+from warrior import Warrior
 #from agent import create_anonymous_agents
 from fife.extensions.fife_settings import Setting
 
@@ -15,7 +16,7 @@ class AgentManager():
 
     def __init__(self, world):
         self.player = 0
-        self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png']
+        self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png', 'gui/images/hud_boy.png']
         self.world = world
 
     def initAgents(self):
@@ -57,20 +58,25 @@ class AgentManager():
             self.bees.append(bee)
             bee.start()
 
+        self.warrior = Warrior(TDS, self.world.model, 'NPC:warrior', self.agentlayer)
+        self.warrior.start()
+
         self.active_agent = self.hero
 
     def reset(self):
-        self.hero, self.girl = None, None
+        self.hero, self.girl, self.warrior = None, None, None
 
     def getActiveAgent(self):
         if self.player == 0:
             return self.hero
-        return self.girl
+        elif self.player == 1:
+            return self.girl
+        elif self.player == 2:
+            return self.warrior
+        return None
 
     def getActiveAgentLocation(self):
-        if self.player == 0:
-            return self.hero.agent.getLocation()
-        return self.girl.agent.getLocation()
+        return self.active_agent.agent.getLocation()
 
     def talk(self, instance):
         self.hero.talk(instance.getLocationRef())
@@ -88,28 +94,36 @@ class AgentManager():
         self.active_agent.run(location)
 
     def getHero(self):
-        return self.hero;
+        return self.hero
 
     def getGirl(self):
         return self.girl
 
-    def toggleAgent(self, face_button):
-        self.player = (self.player + 1) % 2
+    def toggleAgent(self, world, face_button):
+        self.player = (self.player + 1) % 3
+        self.world.player = self.player
         
         face_button.up_image = self.player_faces[self.player]
         face_button.down_image = self.player_faces[self.player]
         face_button.hover_image = self.player_faces[self.player]
         self.hero.idle()
         self.girl.idle()
-        self.girl.isActive = self.player;
+        self.warrior.idle()
+
+        self.girl.isActive = True if self.player==1 else False
+        self.warrior.isActive = True if self.player==2 else False
         if self.player == 0:
             self.world.cameras['main'].attach(self.hero.agent)
             self.world.cameras['small'].attach(self.girl.agent)
             self.active_agent = self.hero
-        else:
+        elif self.player == 1:
             self.world.cameras['main'].attach(self.girl.agent)
             self.world.cameras['small'].attach(self.hero.agent)
             self.active_agent = self.girl
+        elif self.player == 2:
+            self.world.cameras['main'].attach(self.warrior.agent)
+            self.world.cameras['small'].attach(self.hero.agent)
+            self.active_agent = self.warrior
 
     def rightButtonClicked(self, instances, clickpoint):
         if (self.player == 0):
@@ -118,7 +132,6 @@ class AgentManager():
 
 
 def create_anonymous_agents(settings, model, objectName, layer, agentClass):
-    print ">>>>>> agent.py --> create_anonymous_agents"
     agents = []
     instances = [a for a in layer.getInstances() if a.getObject().getId() == objectName]
     i = 0
