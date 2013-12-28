@@ -7,6 +7,7 @@ from priest import Priest
 from beekeeper import Beekeeper
 from bee import Bee
 from warrior import Warrior
+from fireball import Fireball
 from code.game import Game
 #from agent import create_anonymous_agents
 from fife.extensions.fife_settings import Setting
@@ -35,7 +36,7 @@ class AgentManager():
         self.agent_list.append(self.girl)
 
         self.priest = Priest(TDS, self.world.model, 'NPC:priest', self.agentlayer)
-        self.world.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
+        self.world.game.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
         self.priest.start()
 
         self.beekeepers = create_anonymous_agents(TDS, self.world.model, 'beekeeper', self.agentlayer, Beekeeper)
