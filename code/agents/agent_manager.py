@@ -3,6 +3,7 @@ import math, random
 from code.common.common import ProgrammingError
 from hero import Hero
 from girl import Girl
+from priest import Priest
 from beekeeper import Beekeeper
 from bee import Bee
 #from agent import create_anonymous_agents
@@ -36,6 +37,10 @@ class AgentManager():
         self.girl = Girl(TDS, self.world.model, 'NPC:girl', self.agentlayer)
         self.world.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
         self.girl.start()
+
+        self.priest = Priest(TDS, self.world.model, 'NPC:priest', self.agentlayer)
+        self.world.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
+        self.priest.start()
 
         self.beekeepers = create_anonymous_agents(TDS, self.world.model, 'beekeeper', self.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
