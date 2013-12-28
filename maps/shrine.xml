@@ -6021,19 +6021,15 @@
 			<i x="43.0" o="hippie_priest" z="0.0" id="NPC:priest" y="19.0" r="180"></i>
 			<i x="-8.0" o="warrior" y="-2.0" r="0" id="NPC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 
-			<i x="-17.0" o="bee" z="0.0" y="-9.0" r="180" id="NPC:bee:01"></i>
+			<i x="-17.0" o="bee" z="0.0" y="-9.0" r="180" id="NPC:bee:01" visitor_radius="6" visitor_shape="circle"></i>
+			<i x="-15.0" o="bee" z="0.0" y="-11.0" r="180" id="NPC:bee:02" visitor_radius="6" visitor_shape="circle"></i>
+			<i x="-16.0" o="bee" z="0.0" y="-8.0" r="180" id="NPC:bee:03" visitor_radius="6" visitor_shape="circle"></i>
 
-			<i x="-15.0" o="bee" z="0.0" y="-11.0" r="180" id="NPC:bee:02"></i>
+			<i x="40.0" o="bee" z="0.0" y="-30.0" r="180" id="NPC:bee:04"></i>
+			<i x="41.0" o="bee" z="2.0" y="-28.0" r="180" id="NPC:bee:05"></i>
 
-			<i x="-16.0" o="bee" z="0.0" y="-8.0" r="180" id="NPC:bee:03"></i>
-
-			<i x="-13.0" o="bee" z="0.0" y="-6.0" r="180" id="NPC:bee:04"></i>
-
-			<i x="-15.0" o="bee" z="2.0" y="-2.0" r="180" id="NPC:bee:05"></i>
-
-			<i x="-11.0" o="bee" z="2.0" y="-0" r="180" id="NPC:bee:06"></i>
-
-			<i x="-11.0" o="bee" z="2.0" y="-10" r="180" id="NPC:bee:07"></i>
+			<i x="41.0" o="bee" z="2.0" y="24" r="180" id="NPC:bee:06"></i>
+			<i x="40.0" o="bee" z="2.0" y="21" r="180" id="NPC:bee:07"></i>
 
 			<i x="30.0" o="chemist" z="0.0" y="-30.0" r="90"></i>
 			<i x="-45.0" o="beebox" z="0.0" y="-35.0" r="180"></i>

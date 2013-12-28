@@ -7,6 +7,7 @@ from priest import Priest
 from beekeeper import Beekeeper
 from bee import Bee
 from warrior import Warrior
+from code.game import Game
 #from agent import create_anonymous_agents
 from fife.extensions.fife_settings import Setting
 
@@ -18,26 +19,20 @@ class AgentManager():
         self.player = 0
         self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png', 'gui/images/hud_boy.png']
         self.world = world
+        self.agent_list = []
 
     def initAgents(self):
-        """
-        Setup agents.
-
-        For this techdemo we have a very simple 'active things on the map' model,
-        which is called agents. All rio maps will have a separate layer for them.
-
-        Note that we keep a mapping from map instances (C++ model of stuff on the map)
-        to the python agents for later reference.
-        """
         self.agentlayer = self.world.map.getLayer('TechdemoMapGroundObjectLayer')
         self.world.agentlayer = self.agentlayer
         self.hero = Hero(TDS, self.world.model, 'PC', self.agentlayer)
-        self.world.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
+        self.world.game.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
         self.hero.start()
+        self.agent_list.append(self.hero)
 
         self.girl = Girl(TDS, self.world.model, 'NPC:girl', self.agentlayer)
-        self.world.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
+        self.world.game.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
         self.girl.start()
+        self.agent_list.append(self.girl)
 
         self.priest = Priest(TDS, self.world.model, 'NPC:priest', self.agentlayer)
         self.world.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
@@ -45,18 +40,17 @@ class AgentManager():
 
         self.beekeepers = create_anonymous_agents(TDS, self.world.model, 'beekeeper', self.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
-            self.world.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
+            self.world.game.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
+            self.agent_list.append(beekeeper)
 
-        '''self.bees = create_anonymous_agents(TDS, self.world.model, 'bee', self.agentlayer, Bee)
-        for bee in self.bees:
-            self.world.instance_to_agent[bee.agent.getFifeId()] = bee
-            bee.start()'''
         self.bees = []
         for i in range(1, 8):
-            bee = Bee(TDS, self.world.model, 'NPC:bee:0{}'.format(i), self.agentlayer)
+            bee = Bee(TDS, self.world.model, 'NPC:bee:0{}'.format(i), self.agentlayer, self)
             self.bees.append(bee)
+            self.world.game.instance_to_agent[bee.agent.getFifeId()] = bee
             bee.start()
+            self.agent_list.append(bee)
 
         self.warrior = Warrior(TDS, self.world.model, 'NPC:warrior', self.agentlayer)
         self.warrior.start()
@@ -74,6 +68,12 @@ class AgentManager():
         elif self.player == 2:
             return self.warrior
         return None
+
+    def getActiveInstance(self):
+        if self.player == 0:
+            return self.agentlayer.getInstance('PC')
+        elif self.player == 1:
+            return self.agentlayer.getInstance('NPC:girl')
 
     def getActiveAgentLocation(self):
         return self.active_agent.agent.getLocation()
@@ -127,7 +127,14 @@ class AgentManager():
 
     def rightButtonClicked(self, instances, clickpoint):
         if (self.player == 0):
-            self.world.game.dialog.show_instancemenu(clickpoint, instances[0])
+            self.world.game.show_instancemenu(clickpoint, instances[0])
+
+    def getAgentFromId(self, fifeId):
+        for ag in self.agent_list:
+            if ag.agent.getFifeId() == fifeId:
+                return ag
+        return None
+
 
 
 

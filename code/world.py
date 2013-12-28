@@ -93,7 +93,6 @@ class World(EventListenerBase):
         """
         Load a xml map and setup agents and cameras.
         """
-        #dsandlsandlksanldknsa        
         self.filename = filename
         self.reset()
         loader = fife.MapLoader(self.engine.getModel(), 

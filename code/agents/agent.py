@@ -59,3 +59,6 @@ class Agent(fife.InstanceActionListener):
 	def run(self, location):
 		self.state = _STATE_RUN
 		self.agent.move('run', location, self.SPEED)
+
+	def onKick(self):
+		self.agent.say('Hey!', 1000)
