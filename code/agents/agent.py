@@ -62,3 +62,9 @@ class Agent(fife.InstanceActionListener):
 
 	def onKick(self):
 		self.agent.say('Hey!', 1000)
+
+	def getX(self):
+		return self.agent.getLocation().getMapCoordinates().x * 2
+
+	def getY(self):
+		return self.agent.getLocation().getMapCoordinates().y * 2

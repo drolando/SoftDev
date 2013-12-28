@@ -6,6 +6,7 @@ import random
 #TDS = Setting(app_name="rio_de_hola")
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW, _STATE_RAND, _STATE_ATTACK = xrange(6)
+_MODE_WILD, _MODE_BOX = xrange(2)
 
 class Bee(Agent):
     def __init__(self, settings, model, agentName, layer, agentManager, uniqInMap=True):
@@ -14,10 +15,11 @@ class Bee(Agent):
         self.agentManager = agentManager
         self.waypoint_counter = 0
         self.hero = self.layer.getInstance('PC')
-        self.min_x = int(self.agent.getLocation().getMapCoordinates().x * 2 - 8)
-        self.max_x = int(self.agent.getLocation().getMapCoordinates().x * 2 + 8)
-        self.min_y = int(self.agent.getLocation().getMapCoordinates().y * 2 - 8)
-        self.max_y = int(self.agent.getLocation().getMapCoordinates().y * 2 + 8)
+        self.min_x = int(self.getX() - 8)
+        self.max_x = int(self.getX() + 8)
+        self.min_y = int(self.getY() - 8)
+        self.max_y = int(self.getY() + 8)
+        self.mode = _MODE_WILD
         
         self.BEE_SPEED_NORMAL = 1.5 * float(self.settings.get("rio", "TestAgentSpeed"))
         self.BEE_SPEED_FAST = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
@@ -26,7 +28,10 @@ class Bee(Agent):
         if self.state == _STATE_RAND:
             self.rand(self.getNextWaypoint())
         elif self.state == _STATE_FOLLOW:
-            self.attack()
+            if self.nearBeeBoxes() == True:
+                self.rand(self.getNextWaypoint())
+            else:
+                self.attack()
         elif self.state == _STATE_ATTACK:
             self.rand(self.getNextWaypoint())
             
@@ -56,9 +61,24 @@ class Bee(Agent):
         self.agent.move('fly', location, self.BEE_SPEED_NORMAL)
 
     def onKick(self):
-        print "bee -- kick"
-        self.follow_hero()
+        if self.mode == _MODE_WILD:
+            self.follow_hero()
 
     def attack(self):
         self.state = _STATE_ATTACK
         self.agent.actOnce('attack', self.agentManager.getActiveInstance().getLocationRef())
+        self.agentManager.event('attack')
+
+    def nearBeeBoxes(self):
+        print "nearBeeBoxes ", self.getX(), " ", self.getY()
+        if self.getX() >= -48 and self.getX() <= -32 and self.getY() >= -40 and self.getY() <= -26:
+            self.min_x = -48
+            self.max_x = -32
+            self.min_y = -40
+            self.max_y = -26
+            self.mode = _MODE_BOX
+            return True
+        return False
+
+    #x -32 -48
+    #y -26 -40
