@@ -27,6 +27,12 @@ class Game():
         #handle events
         if ev == 'start':
             self.dialog.show("Start", "misc/game/start.txt", self.start)
+        elif ev == 'hit':
+            self._lives -= 1
+            if self._lives <= 0:
+                print "DEAAAAAD"
+                self.reset()
+                self.event('start')
         else:
             print "Event not recognized: {}".format(ev)
 

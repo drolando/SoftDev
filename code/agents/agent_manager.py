@@ -102,7 +102,11 @@ class AgentManager():
     def toggleAgent(self, world, face_button):
         self.player = (self.player + 1) % 3
         self.world.player = self.player
-        
+    
+    def event(self, ev):
+        if ev == 'attack':
+            self.world.game.event('hit')
+
         face_button.up_image = self.player_faces[self.player]
         face_button.down_image = self.player_faces[self.player]
         face_button.hover_image = self.player_faces[self.player]
