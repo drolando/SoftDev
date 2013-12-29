@@ -30,9 +30,10 @@
 		<Setting name="CoordinateLayerName" type="str"> TechdemoMapTileLayer </Setting>
 		<Setting name="QuadTreeLayerName" type="str"> </Setting>
 
-		<Setting name="heroTexts" type="list"> I wonder when the guys will get this world ready for me ; Bring it on baby, I'm ready for action! ; humm di dum.... </Setting>
+		<Setting name="heroTexts" type="list"> humm di dum.... </Setting>
 		<Setting name="girlTexts" type="list"> Why I am running? Haven't you heard that the bees are coming?! ; Heeelp!!! The bees are going to get us! </Setting>
-		<Setting name="beekeeperTexts" type="list"> Some idiot has grown mutated bees around here ; Want to take a look at my farm? ; Did you know that I actually cannot do anything else than stand still and greet everybody? </Setting>
+		<Setting name="beekeeperTexts" type="list"> My bees escaped! Help me and I'll give you a reward. ; Thanks! Take the sword in that crate as reward. ; Do you want to buy some honey? </Setting>
+		<Setting name="warriorTexts" type="list"> We must free the priest. I'll come with you. ; Firstly I need a sword! </Setting>
 
 		<Setting name="TestCameraPlacement" type="int"> 0 </Setting>
 		<Setting name="TestRotationLayerName" type="str"> TechdemoMapTileLayer  </Setting>

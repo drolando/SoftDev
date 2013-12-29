@@ -54,6 +54,7 @@ class AgentManager():
             self.agent_list.append(bee)
 
         self.warrior = Warrior(TDS, self.world.model, 'NPC:warrior', self.agentlayer)
+        self.world.game.instance_to_agent[self.warrior.agent.getFifeId()] = self.warrior
         self.warrior.start()
 
         self.active_agent = self.hero
@@ -80,13 +81,7 @@ class AgentManager():
         return self.active_agent.agent.getLocation()
 
     def talk(self, instance):
-        self.hero.talk(instance.getLocationRef())
-        if instance.getObject().getId() == 'beekeeper':
-            beekeeperTexts = TDS.get("rio", "beekeeperTexts")
-            instance.say(random.choice(beekeeperTexts), 5000)
-        if instance.getObject().getId() == 'girl':
-            girlTexts = TDS.get("rio", "girlTexts")
-            instance.say(random.choice(girlTexts), 5000)
+        self.getActiveAgent().talk(instance.getLocationRef())
 
     def kick(self, location):
         self.hero.kick(location)

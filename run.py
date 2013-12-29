@@ -45,6 +45,11 @@ from fife.extensions.pychan.internal import get_manager
 from fife.extensions.fife_settings import Setting
 from fife.extensions.fife_utils import getUserDataDirectory
 
+settings_path = os.path.expanduser(os.path.join('~', '.fife', 'rio_de_hola'))
+print settings_path
+if os.path.isdir(settings_path):
+    os.remove(os.path.join(settings_path, 'settings.xml'))
+
 TDS = FifePychanSettings(app_name="rio_de_hola")
 
 class ApplicationListener(eventlistenerbase.EventListenerBase):

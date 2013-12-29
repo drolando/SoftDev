@@ -1,12 +1,16 @@
 from fife import fife
 from fife.extensions import *
+from fife.extensions.fife_settings import Setting
 
 from dialog import Dialog
 
+TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
 
 
 class Game():
+    __game = None
+
     def __init__(self, world):
         self.applicationListener = None #run.py
         self.instance_to_agent = {}
@@ -14,6 +18,11 @@ class Game():
         self.agentManager = self.world.agentManager
         self.dialog = Dialog(self)
         self.reset()
+        Game.__game = self
+
+    @classmethod
+    def getGame(cls):
+        return Game.__game
 
     def reset(self):
         self._state = STATE_START
@@ -23,7 +32,7 @@ class Game():
     def setApplicationListener(self, applicationListener):
         self.applicationListener = applicationListener
 
-    def event(self, ev):
+    def event(self, ev, *args):
         #handle events
         if ev == 'start':
             self.dialog.show("Start", "misc/game/start.txt", self.start)
@@ -33,6 +42,9 @@ class Game():
                 print "DEAAAAAD"
                 self.reset()
                 self.event('start')
+        elif ev == 'actionFinished':
+            print "actionFinished"
+
         else:
             print "Event not recognized: {}".format(ev)
 
@@ -67,6 +79,17 @@ class Game():
             self.dialog.hide_instancemenu()
             instance = self.dialog.instancemenu.instance
             self.agentManager.talk(instance)
+
+            if instance.getObject().getId() == 'beekeeper':
+                beekeeperTexts = TDS.get("rio", "beekeeperTexts")
+                instance.say(random.choice(beekeeperTexts), 5000)
+            if instance.getObject().getId() == 'girl':
+                girlTexts = TDS.get("rio", "girlTexts")
+                instance.say(random.choice(girlTexts), 5000)
+            if instance.getObject().getId() == 'warrior':
+                warriorTexts = TDS.get("rio", "warriorTexts")
+                self.agentManager.warrior.say(warriorTexts[0], warriorTexts[1])
+                #self.agentManager.warrior.follow_hero()
 
     def onKickButtonPress(self):
         if self._state == STATE_PLAY:
