@@ -35,7 +35,7 @@ from agents.girl import Girl
 from agents.beekeeper import Beekeeper
 from agents.agent_manager import create_anonymous_agents
 from agents.agent_manager import AgentManager
-from game import Game
+import code.game
 from fife.extensions.fife_settings import Setting
 
 TDS = Setting(app_name="rio_de_hola")
@@ -70,9 +70,10 @@ class World(EventListenerBase):
         self.soundmanager = SoundManager(self.engine)
         self.music = None
 
-        self.agentManager = AgentManager(self)
-        self.game = Game(self)
-        
+        self.game = code.game.Game.getGame()
+
+    def getAgentManager(self):
+        return self.game.agentManager
 
     def reset(self):
         """
@@ -83,7 +84,7 @@ class World(EventListenerBase):
             
         self.map, self.agentlayer = None, None
         self.cameras = {}
-        self.agentManager.reset()
+        #self.agentManager.reset()
         self.clouds, self.beekeepers = [], []
         self.cur_cam2_x, self.initial_cam2_x, self.cam2_scrolling_right = 0, 0, True
         self.target_rotation = 0
@@ -103,7 +104,7 @@ class World(EventListenerBase):
         if loader.isLoadable(filename):
             self.map = loader.load(filename)
 
-        self.agentManager.initAgents()
+        self.getAgentManager().initAgents(self)
         self.initCameras()
 
         #Set background color
@@ -127,7 +128,7 @@ class World(EventListenerBase):
             self.cameras[camera_id] = cam
             cam.resetRenderers()
             
-        self.cameras['main'].attach(self.agentManager.getHero().agent)
+        self.cameras['main'].attach(self.getAgentManager().getHero().agent)
 
         # Floating text renderers currntly only support one font.
         # ... so we set that up.
@@ -180,8 +181,8 @@ class World(EventListenerBase):
         
         # Set up the second camera
         # NOTE: We need to explicitly call setLocation, there's a bit of a messup in the Camera code.
-        self.cameras['small'].setLocation(self.agentManager.getActiveAgentLocation())
-        self.cameras['small'].attach(self.agentManager.getActiveAgent().agent)
+        self.cameras['small'].setLocation(self.getAgentManager().getActiveAgentLocation())
+        self.cameras['small'].attach(self.getAgentManager().getActiveAgent().agent)
         '''self.cameras['small'].setLocation(self.hero.agent.getLocation())
         self.cameras['small'].attach(self.girl.agent)'''
         self.cameras['small'].setOverlayColor(100,0,0,100)
@@ -310,10 +311,10 @@ class World(EventListenerBase):
             renderer.removeAll("girl_simple_light")
 
             if self.lightmodel == 1:
-                node = fife.RendererNode(self.agentManager.getHero())
+                node = fife.RendererNode(self.getAgentManager().getHero())
                 renderer.addSimpleLight("hero_simple_light", node, self.light_sources, 64, 32, 1, 1, 255, 255, 255)
 
-                node = fife.RendererNode(self.agentManager.getGirl())
+                node = fife.RendererNode(self.getAgentManager().getGirl())
                 renderer.addSimpleLight("girl_simple_light", node, self.light_sources, 64, 32, 1, 1, 255, 255, 255)
 
                 for beekeeper in self.beekeepers:

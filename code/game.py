@@ -1,6 +1,8 @@
 from fife import fife
 from fife.extensions import *
 from fife.extensions.fife_settings import Setting
+import world
+import agents.agent_manager
 
 from dialog import Dialog
 
@@ -11,14 +13,14 @@ STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
 class Game():
     __game = None
 
-    def __init__(self, world):
+    def __init__(self, engine):
+        Game.__game = self
         self.applicationListener = None #run.py
         self.instance_to_agent = {}
-        self.world = world
-        self.agentManager = self.world.agentManager
+        self.world= world.World(engine)
+        self.agentManager = agents.agent_manager.AgentManager(self.world)
         self.dialog = Dialog(self)
         self.reset()
-        Game.__game = self
 
     @classmethod
     def getGame(cls):
@@ -109,7 +111,7 @@ class Game():
 
     def onFacePressed(self, face_button):
         if self._state == STATE_PLAY:
-            self.agentManager.toggleAgent(face_button)
+            self.agentManager.toggleAgent(self.world, face_button)
 
     def show_instancemenu(self, clickpoint, instance):
         if instance.getFifeId() == self.agentManager.getHero().agent.getFifeId():
@@ -125,3 +127,12 @@ class Game():
                 buttons.append('talkButton')
                 buttons.append('kickButton')
         self.dialog.show_instancemenu(clickpoint, instance, buttons)
+
+    def load(self, map):
+        self.world.load(map)
+
+    def save(self, file):
+        self.world.save(file)
+
+    def pump(self):
+        self.world.pump()

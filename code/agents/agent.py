@@ -24,7 +24,7 @@
 from fife import fife
 from fife.fife import IAnimationLoader
 from code.common.common import ProgrammingError
-from code.game import Game
+import code.game
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
 
@@ -41,7 +41,7 @@ class Agent(fife.InstanceActionListener):
 			self.agent.addActionListener(self)
 		self.SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
 		self.secondSentence = None
-		self.game = Game.getGame()
+		self.game = code.game.Game.getGame()
 
 	def onInstanceActionFinished(self, instance, action):
 		raise ProgrammingError('No OnActionFinished defined for Agent')

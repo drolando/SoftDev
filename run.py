@@ -34,7 +34,6 @@ from fife import fife
 print "Using the FIFE python module found here: ", os.path.dirname(fife.__file__)
 
 from fife.extensions import *
-from code import world
 from code.common import eventlistenerbase
 from code.game import Game
 from fife.extensions import pychan
@@ -53,10 +52,10 @@ if os.path.isdir(settings_path):
 TDS = FifePychanSettings(app_name="rio_de_hola")
 
 class ApplicationListener(eventlistenerbase.EventListenerBase):
-    def __init__(self, engine, world):
+    def __init__(self, engine, game):
         super(ApplicationListener, self).__init__(engine,regKeys=True,regCmd=True, regMouse=False, regConsole=False, regWidget=True)
         self.engine = engine
-        self.world = world
+        self.game = game
         engine.getEventManager().setNonConsumableKeys([
             fife.Key.ESCAPE,])
 
@@ -77,9 +76,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         })
         self.character_gui.show()
 
-        self.game = self.world.game
         self.game.setApplicationListener(self)
-        
         self.game.event('start')
         
 
@@ -122,9 +119,9 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
 class IslandDemo(PychanApplicationBase):
     def __init__(self):
         super(IslandDemo,self).__init__(TDS)
-        self.world = world.World(self.engine)
-        self.listener = ApplicationListener(self.engine, self.world)
-        self.world.load(str(TDS.get("rio", "MapFile")))
+        self.game = Game(self.engine)
+        self.listener = ApplicationListener(self.engine, self.game)
+        self.game.load(str(TDS.get("rio", "MapFile")))
 
     def createListener(self):
         pass # already created in constructor
@@ -141,9 +138,9 @@ class IslandDemo(PychanApplicationBase):
                 os.makedirs(mapSaveDir)
             
             # save map file to directory
-            self.world.save(mapSaveDir + "/savefile.xml")
+            self.game.save(mapSaveDir + "/savefile.xml")
         else:
-            self.world.pump()
+            self.game.pump()
 
 def main():
     app = IslandDemo()
