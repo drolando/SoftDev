@@ -16,7 +16,7 @@ class Warrior(Agent):
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0
         self.isActive = False
-        self._mode = _MODE_LIGHT
+        self._mode = _MODE_ARMED
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
@@ -64,3 +64,6 @@ class Warrior(Agent):
     def gotSword(self):
         self._mode = _MODE_ARMED
         self.idle()
+
+    def attack(self, location):
+        self.agent.actOnce('attack', location)

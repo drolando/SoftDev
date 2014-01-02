@@ -82,6 +82,9 @@ class AgentManager():
             return self.agentlayer.getInstance('PC')
         elif self.player == 1:
             return self.agentlayer.getInstance('NPC:girl')
+        elif self.player == 2:
+            return self.agentlayer.getInstance('NPC:warrior')
+        return None
 
     def getActiveAgentLocation(self):
         return self.active_agent.agent.getLocation()
@@ -115,24 +118,27 @@ class AgentManager():
         self.girl.idle()
         self.warrior.idle()
 
+        self.hero.isActive = True if self.player==0 else False
         self.girl.isActive = True if self.player==1 else False
         self.warrior.isActive = True if self.player==2 else False
         if self.player == 0:
             world.cameras['main'].attach(self.hero.agent)
             world.cameras['small'].attach(self.girl.agent)
             self.active_agent = self.hero
+            self.girl.follow_hero()
+            self.warrior.follow_hero()
         elif self.player == 1:
             world.cameras['main'].attach(self.girl.agent)
             world.cameras['small'].attach(self.hero.agent)
             self.active_agent = self.girl
+            self.hero.follow_hero()
+            self.warrior.follow_hero()
         elif self.player == 2:
             world.cameras['main'].attach(self.warrior.agent)
             world.cameras['small'].attach(self.hero.agent)
             self.active_agent = self.warrior
-
-    def rightButtonClicked(self, instances, clickpoint):
-        if (self.player == 0):
-            self.game.show_instancemenu(clickpoint, instances[0])
+            self.hero.follow_hero()
+            self.girl.follow_hero()
 
     def getAgentFromId(self, fifeId):
         for ag in self.agent_list:

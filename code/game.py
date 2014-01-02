@@ -8,8 +8,8 @@ from dialog import Dialog
 
 TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
-EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED = xrange(4)
-STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1, STATE_SWORD = xrange(4)
+EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED, EV_QUEST_2 = xrange(5)
+STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1, STATE_SWORD, STATE_BEE2 = xrange(5)
 
 
 class Game():
@@ -54,6 +54,9 @@ class Game():
         elif ev == EV_BEE_ARRIVED:
             if self.agentManager.beesAtHome():
                 self._secState = STATE_BEE1
+        elif ev == EV_QUEST_2:
+            self.state = STATE_PAUSE
+            self.dialog.show("Play", "misc/game/quest2.txt", self.quest2)
         else:
             print "Event not recognized: {}".format(ev)
 
@@ -66,6 +69,12 @@ class Game():
         self._quest = 1
         self._state = STATE_PLAY
 
+    def quest2(self):
+        self.dialog.gameStatusWindow.hide()
+        self._quest = 2
+        self._state = STATE_PLAY
+        self._secState = STATE_BEE2
+
     def leftClick(self, clickpoint):
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
@@ -75,7 +84,7 @@ class Game():
         if self._state == STATE_PLAY:
             print "selected instances on agent layer: ", [i.getObject().getId() for i in instances]
             if instances:
-                self.agentManager.rightButtonClicked(instances, clickpoint)
+                self.show_instancemenu(clickpoint, instances[0])
 
     # Callbacks from the popupmenu
     def onMoveButtonPress(self):
@@ -111,6 +120,7 @@ class Game():
                         t.start()
                     else:
                         self.agentManager.warrior.say(warriorTexts[1])
+                        self.agentManager.warrior.follow_hero()
                 else:
                     self.agentManager.warrior.say(warriorTexts[2])
 
@@ -139,33 +149,50 @@ class Game():
             inst = self.dialog.instancemenu.instance
             saytext = []
             saytext.append('%s' % inst.getObject().getId())
-            self.agentManager.getHero().agent.say('\n'.join(saytext), 3500)
+            self.agentManager.getActiveAgent().say('\n'.join(saytext))
 
     def onOpenButtonPress(self):
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
             self._secState = STATE_SWORD
             self.agentManager.warrior.gotSword()
+            self.event(EV_QUEST_2)
+
+    def onAttackButtonPress(self):
+        if self._state == STATE_PLAY:
+            self.dialog.hide_instancemenu()
+            self.agentManager.warrior.attack(self.dialog.instancemenu.instance.getLocationRef())
+            self.agentManager.getAgentFromId(self.dialog.instancemenu.instance.getFifeId()).onAttack()
 
     def onFacePressed(self, face_button):
         if self._state == STATE_PLAY:
             self.agentManager.toggleAgent(self.world, face_button)
 
     def show_instancemenu(self, clickpoint, instance):
-        if instance.getFifeId() == self.agentManager.getHero().agent.getFifeId():
+        fife_id = instance.getFifeId()
+        id = instance.getId()
+        if fife_id == self.agentManager.getActiveInstance().getFifeId():
+            return
+        if id[:-2] == "NPC:bee:" and self.agentManager.getAgentFromId(fife_id).isDead == True:
             return
         # Add the buttons according to circumstances.
         buttons = ['inspectButton']
 
-        target_distance = self.agentManager.getHero().agent.getLocationRef().getLayerDistanceTo(instance.getLocationRef())
-        if target_distance > 3.0:
+        target_distance = self.agentManager.getActiveInstance().getLocationRef().getLayerDistanceTo(instance.getLocationRef())
+        if target_distance > 4.0:
             buttons.append('moveButton')
         else:
-            if self.instance_to_agent.has_key(instance.getFifeId()):
+            if self.instance_to_agent.has_key(fife_id):
                 buttons.append('talkButton')
-                buttons.append('kickButton')
-        if instance.getId() == "sword_crate" and self._secState == STATE_BEE1:
-            buttons.append("openButton")
+                if (id[:-2] != "NPC:bee:" or id[-2:] < 3):
+                    buttons.append('kickButton')
+        if self._quest == 1:
+            if id == "sword_crate" and self._secState == STATE_BEE1:
+                buttons.append("openButton")
+        elif self._quest == 2:
+            if (self._secState == STATE_BEE2 and self.agentManager.getActiveAgent().agentName == "NPC:warrior"
+                and id[:-2] == "NPC:bee:" and id[-2:] >= 3):
+                buttons.append('attackButton')
         self.dialog.show_instancemenu(clickpoint, instance, buttons)
 
     def load(self, map):

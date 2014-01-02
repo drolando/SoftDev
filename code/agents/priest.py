@@ -44,7 +44,7 @@ class Priest(Agent):
         self.GIRL_SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
     def onInstanceActionFinished(self, instance, action):
-        self.cast_spell()
+        self.idle()
 
     def onInstanceActionCancelled(self, instance, action):
         print "onInstanceActionCancelled"

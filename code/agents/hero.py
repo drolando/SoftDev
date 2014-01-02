@@ -24,43 +24,53 @@
 import random
 from agent import Agent
 from fife.extensions.fife_settings import Setting
+from fife import fife
 
 #TDS = Setting(app_name="rio_de_hola")
 
-_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
+_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK, _STATE_FOLLOW = xrange(6)
 
 class Hero(Agent):
-	def __init__(self, settings, model, agentName, layer, uniqInMap=True):
-		super(Hero, self).__init__(settings, model, agentName, layer, uniqInMap)
-		self.state = _STATE_NONE
-		self.idlecounter = 1
-		self.HERO_SPEED = 4 * self.settings.get("rio", "TestAgentSpeed")
+    def __init__(self, settings, model, agentName, layer, uniqInMap=True):
+        super(Hero, self).__init__(settings, model, agentName, layer, uniqInMap)
+        self.state = _STATE_NONE
+        self.waypoints = ((67, 80), (75, 44))
+        self.waypoint_counter = 0
+        self.isActive = True
+        self.SPEED = 4 * self.settings.get("rio", "TestAgentSpeed")
 
-	def onInstanceActionFinished(self, instance, action):
-		self.idle()
-		if action.getId() != 'stand':
-			self.idlecounter = 1
-		else:
-			self.idlecounter += 1
-		if self.idlecounter % 7 == 0:
-			heroTexts = self.settings.get("rio", "heroTexts")
-			txtindex = random.randint(0, len(heroTexts) - 1)
-			instance.say(heroTexts[txtindex], 2500)
+    def onInstanceActionFinished(self, instance, action):
+        if ((self.state in (_STATE_RUN, _STATE_FOLLOW)) or (self.isActive == True)):
+            self.idle()
+        else:
+            if self.waypoint_counter % 3:
+                self.waypoint_counter += 1
+                self.follow_hero()
+            else:
+                self.run(self.getNextWaypoint())
 
-	def onInstanceActionCancelled(self, instance, action):
-		pass
-	
-	def run(self, location):
-		print "------- run ", location
-		self.state = _STATE_RUN
-		self.agent.move('run', location, self.HERO_SPEED)
+    def getNextWaypoint(self):
+        self.waypoint_counter += 1
+        l = fife.Location(self.layer)
+        l.setLayerCoordinates(fife.ModelCoordinate(*self.waypoints[self.waypoint_counter % len(self.waypoints)]))
+        return l
 
-	def kick(self, target):
-		self.state = _STATE_KICK
-		self.agent.actOnce('kick', target)
+    def onInstanceActionCancelled(self, instance, action):
+        pass
+    
+    def run(self, location):
+        print "------- run ", location
+        self.state = _STATE_RUN
+        self.agent.move('run', location, self.SPEED)
 
-	def talk(self, target):
-		self.state = _STATE_TALK
-		self.agent.actOnce('talk', target)
+    def kick(self, target):
+        self.state = _STATE_KICK
+        self.agent.actOnce('kick', target)
 
+    def talk(self, target):
+        self.state = _STATE_TALK
+        self.agent.actOnce('talk', target)
 
+    def follow_hero(self):
+        self.state = _STATE_FOLLOW
+        self.agent.follow('run', self.game.agentManager.getActiveInstance(), self.SPEED)

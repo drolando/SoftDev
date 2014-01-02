@@ -6021,6 +6021,8 @@
 			<i x="43.0" o="hippie_priest" z="0.0" id="NPC:priest" y="19.0" r="180"></i>
 			<i x="41.0" o="fireball" z="0.0" id="NPC:fireball" y="19.0" r="180"></i>
 
+			<i x="43.0" o="warrior" y="20.0" r="0" id="NPC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
+
 			<i x="-17.0" o="bee" z="0.0" y="-9.0" r="180" id="NPC:bee:01" visitor_radius="6" visitor_shape="circle"></i>
 			<i x="-15.0" o="bee" z="0.0" y="-11.0" r="180" id="NPC:bee:02" visitor_radius="6" visitor_shape="circle"></i>
 			<i x="-16.0" o="bee" z="0.0" y="-8.0" r="180" id="NPC:bee:03" visitor_radius="6" visitor_shape="circle"></i>
@@ -6031,7 +6033,6 @@
 			<i x="40.0" o="bee" z="2.0" y="21" r="180" id="NPC:bee:07"></i>
 
 			<i x="30.0" o="chemist" z="0.0" y="-30.0" r="90"></i>
-			<i x="43.0" o="warrior" y="-20.0" r="0" id="NPC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 
 			<i x="35.0" o="boy" y="-20.0" r="0" id="PC" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 

@@ -1,0 +1,7 @@
+  QUEST 2:
+    - Free the priest
+    - Get a spell from the chemist
+
+  -------------------------------------------------------------------------------  
+  Hints:
+    - Attack the bees with the warrior
