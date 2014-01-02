@@ -24,7 +24,7 @@
 from fife import fife
 from fife.fife import IAnimationLoader
 from code.common.common import ProgrammingError
-from code.game import Game
+import code.game
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
 
@@ -40,11 +40,10 @@ class Agent(fife.InstanceActionListener):
 			self.agent = layer.getInstance(agentName)
 			self.agent.addActionListener(self)
 		self.SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
-		self.secondSentence = None
-		self.game = Game.getGame()
+		self.game = code.game.Game.getGame()
 
 	def onInstanceActionFinished(self, instance, action):
-		raise ProgrammingError('No OnActionFinished defined for Agent')
+		self.game.event(code.game.Game.ACTION_FINISHED, "agent", action.getId())
 
 	def onInstanceActionCancelled(self, instance, action):
 		raise ProgrammingError('No OnActionFinished defined for Agent')
@@ -72,7 +71,5 @@ class Agent(fife.InstanceActionListener):
 	def getY(self):
 		return self.agent.getLocation().getMapCoordinates().y * 2
 
-	def say(self, text, secondSentence=None):
+	def say(self, text):
 		self.agent.say(text, 2500)
-		if secondSentence != None:
-			self.secondSentence = secondSentence

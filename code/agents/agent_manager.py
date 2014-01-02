@@ -8,8 +8,7 @@ from beekeeper import Beekeeper
 from bee import Bee
 from warrior import Warrior
 from fireball import Fireball
-from code.game import Game
-#from agent import create_anonymous_agents
+import code.game
 from fife.extensions.fife_settings import Setting
 
 TDS = Setting(app_name="rio_de_hola")
@@ -19,42 +18,42 @@ class AgentManager():
     def __init__(self, world):
         self.player = 0
         self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png', 'gui/images/hud_boy.png']
-        self.world = world
         self.agent_list = []
+        self.game = code.game.Game.getGame()
 
-    def initAgents(self):
-        self.agentlayer = self.world.map.getLayer('TechdemoMapGroundObjectLayer')
-        self.world.agentlayer = self.agentlayer
-        self.hero = Hero(TDS, self.world.model, 'PC', self.agentlayer)
-        self.world.game.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
+    def initAgents(self, world):
+        self.agentlayer = world.map.getLayer('TechdemoMapGroundObjectLayer')
+        world.agentlayer = self.agentlayer
+        self.hero = Hero(TDS, world.model, 'PC', self.agentlayer)
+        self.game.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
         self.hero.start()
         self.agent_list.append(self.hero)
 
-        self.girl = Girl(TDS, self.world.model, 'NPC:girl', self.agentlayer)
-        self.world.game.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
+        self.girl = Girl(TDS, world.model, 'NPC:girl', self.agentlayer)
+        self.game.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
         self.girl.start()
         self.agent_list.append(self.girl)
 
-        self.priest = Priest(TDS, self.world.model, 'NPC:priest', self.agentlayer)
-        self.world.game.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
+        self.priest = Priest(TDS, world.model, 'NPC:priest', self.agentlayer)
+        self.game.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
         self.priest.start()
 
-        self.beekeepers = create_anonymous_agents(TDS, self.world.model, 'beekeeper', self.agentlayer, Beekeeper)
+        self.beekeepers = create_anonymous_agents(TDS, world.model, 'beekeeper', self.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
-            self.world.game.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
+            self.game.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
             self.agent_list.append(beekeeper)
 
         self.bees = []
         for i in range(1, 8):
-            bee = Bee(TDS, self.world.model, 'NPC:bee:0{}'.format(i), self.agentlayer, self)
+            bee = Bee(TDS, world.model, 'NPC:bee:0{}'.format(i), self.agentlayer, self)
             self.bees.append(bee)
-            self.world.game.instance_to_agent[bee.agent.getFifeId()] = bee
+            self.game.instance_to_agent[bee.agent.getFifeId()] = bee
             bee.start()
             self.agent_list.append(bee)
 
-        self.warrior = Warrior(TDS, self.world.model, 'NPC:warrior', self.agentlayer)
-        self.world.game.instance_to_agent[self.warrior.agent.getFifeId()] = self.warrior
+        self.warrior = Warrior(TDS, world.model, 'NPC:warrior', self.agentlayer)
+        self.game.instance_to_agent[self.warrior.agent.getFifeId()] = self.warrior
         self.warrior.start()
 
         self.active_agent = self.hero
@@ -95,13 +94,12 @@ class AgentManager():
     def getGirl(self):
         return self.girl
 
-    def toggleAgent(self, world, face_button):
-        self.player = (self.player + 1) % 3
-        self.world.player = self.player
-    
     def event(self, ev):
         if ev == 'attack':
-            self.world.game.event('hit')
+            self.game.event('hit')
+
+    def toggleAgent(self, world, face_button):
+        self.player = (self.player + 1) % 3
 
         face_button.up_image = self.player_faces[self.player]
         face_button.down_image = self.player_faces[self.player]
@@ -113,21 +111,21 @@ class AgentManager():
         self.girl.isActive = True if self.player==1 else False
         self.warrior.isActive = True if self.player==2 else False
         if self.player == 0:
-            self.world.cameras['main'].attach(self.hero.agent)
-            self.world.cameras['small'].attach(self.girl.agent)
+            world.cameras['main'].attach(self.hero.agent)
+            world.cameras['small'].attach(self.girl.agent)
             self.active_agent = self.hero
         elif self.player == 1:
-            self.world.cameras['main'].attach(self.girl.agent)
-            self.world.cameras['small'].attach(self.hero.agent)
+            world.cameras['main'].attach(self.girl.agent)
+            world.cameras['small'].attach(self.hero.agent)
             self.active_agent = self.girl
         elif self.player == 2:
-            self.world.cameras['main'].attach(self.warrior.agent)
-            self.world.cameras['small'].attach(self.hero.agent)
+            world.cameras['main'].attach(self.warrior.agent)
+            world.cameras['small'].attach(self.hero.agent)
             self.active_agent = self.warrior
 
     def rightButtonClicked(self, instances, clickpoint):
         if (self.player == 0):
-            self.world.game.show_instancemenu(clickpoint, instances[0])
+            self.game.show_instancemenu(clickpoint, instances[0])
 
     def getAgentFromId(self, fifeId):
         for ag in self.agent_list:
