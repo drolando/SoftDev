@@ -1,13 +1,15 @@
 from fife import fife
 from fife.extensions import *
 from fife.extensions.fife_settings import Setting
+from threading import Timer
 import world
 import agents.agent_manager
-
 from dialog import Dialog
 
 TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
+EV_START, EV_ACTION_FINISHED, EV_HIT = xrange(3)
+STATE_WARRIOR1, STATE_WARRIOR2 = xrange(2)
 
 
 class Game():
@@ -30,22 +32,25 @@ class Game():
         self._state = STATE_START
         self._lives = 3
         self._quest = 0
+        self._secState = None
 
     def setApplicationListener(self, applicationListener):
         self.applicationListener = applicationListener
 
     def event(self, ev, *args):
         #handle events
-        if ev == 'start':
+        if ev == EV_START:
+            self.state = STATE_START
             self.dialog.show("Start", "misc/game/start.txt", self.start)
-        elif ev == 'hit':
+        elif ev == EV_HIT:
             self._lives -= 1
             if self._lives <= 0:
                 print "DEAAAAAD"
                 self.reset()
                 self.event('start')
-        elif ev == 'actionFinished':
-            print "actionFinished"
+        elif ev == EV_ACTION_FINISHED:
+            if args[0] == "warrior":
+                pass
 
         else:
             print "Event not recognized: {}".format(ev)
@@ -90,8 +95,26 @@ class Game():
                 instance.say(random.choice(girlTexts), 5000)
             if instance.getObject().getId() == 'warrior':
                 warriorTexts = TDS.get("rio", "warriorTexts")
-                self.agentManager.warrior.say(warriorTexts[0], warriorTexts[1])
+                if self._quest == 1:
+                    if self._secState == None:
+                        self._secState = STATE_WARRIOR1
+                        self.agentManager.warrior.say(warriorTexts[0])
+                        t = Timer(2.5, self.warr1)
+                        t.start()
+                    else:
+                        self.agentManager.warrior.say(warriorTexts[1])
+                else:
+                    self.agentManager.warrior.say(warriorTexts[2])
                 #self.agentManager.warrior.follow_hero()
+
+    def warr1(self, *args):
+        warriorTexts = TDS.get("rio", "warriorTexts")
+        self.agentManager.warrior.say(warriorTexts[1])
+        t = Timer(2.5, self.warr2)
+        t.start()
+
+    def warr2(self, *args):
+        self.agentManager.warrior.follow_hero()
 
     def onKickButtonPress(self):
         if self._state == STATE_PLAY:

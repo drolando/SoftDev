@@ -25,7 +25,7 @@
 		</animation>
 	</action>
 	<action id="run">
-		<animation atlas="warrior.png" height="128" width="128">
+		<animation atlas="run.png" height="128" width="128">
 			<direction delay="130" dir="180" frames="8"/>
 			<direction delay="130" dir="135" frames="8"/>
 			<direction delay="130" dir="90" frames="8"/>

@@ -35,7 +35,7 @@ print "Using the FIFE python module found here: ", os.path.dirname(fife.__file__
 
 from fife.extensions import *
 from code.common import eventlistenerbase
-from code.game import Game
+import code.game
 from fife.extensions import pychan
 from fife.extensions.pychan.pychanbasicapplication import PychanApplicationBase
 from fife.extensions.pychan.fife_pychansettings import FifePychanSettings
@@ -77,7 +77,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         self.character_gui.show()
 
         self.game.setApplicationListener(self)
-        self.game.event('start')
+        self.game.event(code.game.EV_START)
         
 
     def keyPressed(self, evt):
@@ -119,7 +119,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
 class IslandDemo(PychanApplicationBase):
     def __init__(self):
         super(IslandDemo,self).__init__(TDS)
-        self.game = Game(self.engine)
+        self.game = code.game.Game(self.engine)
         self.listener = ApplicationListener(self.engine, self.game)
         self.game.load(str(TDS.get("rio", "MapFile")))
 

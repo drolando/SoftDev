@@ -1,4 +1,6 @@
 from agent import Agent
+import code.game
+
 from fife import fife
 from fife.extensions.fife_settings import Setting
 
@@ -12,24 +14,12 @@ class Warrior(Agent):
         self.state = _STATE_NONE
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0
-        self.hero = self.layer.getInstance('PC')
         self.isActive = False
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
     def onInstanceActionFinished(self, instance, action):
-        '''if ((self.state in (_STATE_RUN, _STATE_FOLLOW)) or (self.isActive == True)):
-            self.idle()
-        else:
-            if self.waypoint_counter % 3:
-                self.waypoint_counter += 1
-                self.follow_hero()
-            else:
-                self.run(self.getNextWaypoint())'''
-        self.game.event('actionFinished', 'warrior', action.getId())
-        if self.secondSentence != None:
-            self.say(self.secondSentence)
-            self.secondSentence = None
+        self.game.event(code.game.EV_ACTION_FINISHED, 'warrior', action.getId())
         if self.state == _STATE_FOLLOW:
             self.follow_hero()
         elif self.state == _STATE_IDLE:
@@ -49,7 +39,7 @@ class Warrior(Agent):
 
     def follow_hero(self):
         self.state = _STATE_FOLLOW
-        self.agent.follow('run', self.hero, self.SPEED)
+        self.agent.follow('run', self.game.agentManager.getActiveInstance(), self.SPEED)
 
     def run(self, location):
         self.state = _STATE_RUN
