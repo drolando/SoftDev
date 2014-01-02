@@ -1,0 +1,8 @@
+  QUEST 1:
+    - Speak with the warrior
+    - Find him a new sword
+
+  -------------------------------------------------------------------------------  
+  Hints:
+    - kick the bees to get them follow you
+    - you only need to bring back the 3 bees near the lake

@@ -22,7 +22,9 @@
 # ####################################################################
 
 from fife import fife
+from fife.fife import IAnimationLoader
 from code.common.common import ProgrammingError
+import code.game
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
 
@@ -37,16 +39,15 @@ class Agent(fife.InstanceActionListener):
 		if uniqInMap:
 			self.agent = layer.getInstance(agentName)
 			self.agent.addActionListener(self)
-			print '------------------ Agent ' + agentName + ' -------------------- '
-			print '------------------ ', self.agent
-		self.AGENT_SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
+		self.SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
+		self.game = code.game.Game.getGame()
 
 	def onInstanceActionFinished(self, instance, action):
-		raise ProgrammingError('No OnActionFinished defined for Agent')
+		self.game.event(code.game.Game.ACTION_FINISHED, "agent", action.getId())
 
 	def onInstanceActionCancelled(self, instance, action):
 		raise ProgrammingError('No OnActionFinished defined for Agent')
-	
+
 	def onInstanceActionFrame(self, instance, action, frame):
 		raise ProgrammingError('No OnActionFrame defined for Agent')	
 
@@ -59,4 +60,16 @@ class Agent(fife.InstanceActionListener):
 
 	def run(self, location):
 		self.state = _STATE_RUN
-		self.agent.move('run', location, self.GIRL_SPEED)
+		self.agent.move('run', location, self.SPEED)
+
+	def onKick(self):
+		self.agent.say('Hey!', 1000)
+
+	def getX(self):
+		return self.agent.getLocation().getMapCoordinates().x * 2
+
+	def getY(self):
+		return self.agent.getLocation().getMapCoordinates().y * 2
+
+	def say(self, text):
+		self.agent.say(text, 2500)

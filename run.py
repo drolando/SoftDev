@@ -34,8 +34,8 @@ from fife import fife
 print "Using the FIFE python module found here: ", os.path.dirname(fife.__file__)
 
 from fife.extensions import *
-from code import world
 from code.common import eventlistenerbase
+import code.game
 from fife.extensions import pychan
 from fife.extensions.pychan.pychanbasicapplication import PychanApplicationBase
 from fife.extensions.pychan.fife_pychansettings import FifePychanSettings
@@ -44,13 +44,18 @@ from fife.extensions.pychan.internal import get_manager
 from fife.extensions.fife_settings import Setting
 from fife.extensions.fife_utils import getUserDataDirectory
 
+settings_path = os.path.expanduser(os.path.join('~', '.fife', 'rio_de_hola'))
+print settings_path
+if os.path.isdir(settings_path):
+    os.remove(os.path.join(settings_path, 'settings.xml'))
+
 TDS = FifePychanSettings(app_name="rio_de_hola")
 
 class ApplicationListener(eventlistenerbase.EventListenerBase):
-    def __init__(self, engine, world):
+    def __init__(self, engine, game):
         super(ApplicationListener, self).__init__(engine,regKeys=True,regCmd=True, regMouse=False, regConsole=False, regWidget=True)
         self.engine = engine
-        self.world = world
+        self.game = game
         engine.getEventManager().setNonConsumableKeys([
             fife.Key.ESCAPE,])
 
@@ -70,6 +75,9 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
             'face' : self.onFacePressed
         })
         self.character_gui.show()
+
+        self.game.setApplicationListener(self)
+        self.game.event(code.game.EV_START)
         
 
     def keyPressed(self, evt):
@@ -105,15 +113,15 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
 
     def onFacePressed(self):
         face_button = self.character_gui.findChild(name="face")
-        self.world.agentManager.toggleAgent(self.world, face_button)
+        self.game.onFacePressed(face_button)
 
 
 class IslandDemo(PychanApplicationBase):
     def __init__(self):
         super(IslandDemo,self).__init__(TDS)
-        self.world = world.World(self.engine)
-        self.listener = ApplicationListener(self.engine, self.world)
-        self.world.load(str(TDS.get("rio", "MapFile")))
+        self.game = code.game.Game(self.engine)
+        self.listener = ApplicationListener(self.engine, self.game)
+        self.game.load(str(TDS.get("rio", "MapFile")))
 
     def createListener(self):
         pass # already created in constructor
@@ -130,9 +138,9 @@ class IslandDemo(PychanApplicationBase):
                 os.makedirs(mapSaveDir)
             
             # save map file to directory
-            self.world.save(mapSaveDir + "/savefile.xml")
+            self.game.save(mapSaveDir + "/savefile.xml")
         else:
-            self.world.pump()
+            self.game.pump()
 
 def main():
     app = IslandDemo()

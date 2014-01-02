@@ -1,0 +1,4 @@
+<Window title="Game">
+	<TextBox name="gameStatus"/>
+	<Button name="playButton" text="Play"/>
+</Window>
