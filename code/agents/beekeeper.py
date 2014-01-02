@@ -50,4 +50,4 @@ class Beekeeper(Agent):
 
 	def talk(self):
 		self.state = _STATE_TALK
-		self.agent.actRepeat('talk', self.facingLoc) # never calls back
+		#self.agent.actRepeat('talk', self.facingLoc) # never calls back

@@ -3,4 +3,5 @@
 	<Button name="talkButton" text="Talk" />
 	<Button name="kickButton" text="Kick" />
 	<Button name="inspectButton" text="Inspect" />
+    <Button name="openButton" text="Open" />
 </VBox>

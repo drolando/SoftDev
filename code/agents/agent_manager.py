@@ -5,7 +5,7 @@ from hero import Hero
 from girl import Girl
 from priest import Priest
 from beekeeper import Beekeeper
-from bee import Bee
+import code.agents.bee
 from warrior import Warrior
 from fireball import Fireball
 import code.game
@@ -46,7 +46,7 @@ class AgentManager():
 
         self.bees = []
         for i in range(1, 8):
-            bee = Bee(TDS, world.model, 'NPC:bee:0{}'.format(i), self.agentlayer, self)
+            bee = code.agents.bee.Bee(TDS, world.model, 'NPC:bee:0{}'.format(i), self.agentlayer, self)
             self.bees.append(bee)
             self.game.instance_to_agent[bee.agent.getFifeId()] = bee
             bee.start()
@@ -57,6 +57,13 @@ class AgentManager():
         self.warrior.start()
 
         self.active_agent = self.hero
+
+    def beesAtHome(self):
+        for bee in self.bees:
+            print "-------------------------- bee name: ", bee.agentName[-2:]
+            if bee.agentName[-2:] <= 2 and bee.mode == code.agents.bee._MODE_WILD:
+                return False
+        return True
 
     def reset(self):
         self.hero, self.girl, self.warrior = None, None, None

@@ -2,6 +2,7 @@ from agent import Agent
 from fife import fife
 from fife.extensions.fife_settings import Setting
 import random
+import code.game
 
 #TDS = Setting(app_name="rio_de_hola")
 
@@ -30,6 +31,7 @@ class Bee(Agent):
         elif self.state == _STATE_FOLLOW:
             if self.nearBeeBoxes() == True:
                 self.rand(self.getNextWaypoint())
+                self.game.event(code.game.EV_BEE_ARRIVED)
             else:
                 self.attack()
         elif self.state == _STATE_ATTACK:

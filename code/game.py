@@ -8,8 +8,8 @@ from dialog import Dialog
 
 TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
-EV_START, EV_ACTION_FINISHED, EV_HIT = xrange(3)
-STATE_WARRIOR1, STATE_WARRIOR2 = xrange(2)
+EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED = xrange(4)
+STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1 = xrange(3)
 
 
 class Game():
@@ -51,7 +51,9 @@ class Game():
         elif ev == EV_ACTION_FINISHED:
             if args[0] == "warrior":
                 pass
-
+        elif ev == EV_BEE_ARRIVED:
+            if self.agentManager.beesAtHome:
+                self._secState = STATE_BEE1
         else:
             print "Event not recognized: {}".format(ev)
 
@@ -89,7 +91,12 @@ class Game():
 
             if instance.getObject().getId() == 'beekeeper':
                 beekeeperTexts = TDS.get("rio", "beekeeperTexts")
-                instance.say(random.choice(beekeeperTexts), 5000)
+                if self._secState == STATE_WARRIOR2:
+                    instance.say(beekeeperTexts[0], 5000)
+                elif self._secState == STATE_BEE1:
+                    instance.say(beekeeperTexts[1], 5000)
+                else:
+                    instance.say("Hey!", 3000)
             if instance.getObject().getId() == 'girl':
                 girlTexts = TDS.get("rio", "girlTexts")
                 instance.say(random.choice(girlTexts), 5000)
@@ -97,6 +104,7 @@ class Game():
                 warriorTexts = TDS.get("rio", "warriorTexts")
                 if self._quest == 1:
                     if self._secState == None:
+                        self._state = STATE_PAUSE
                         self._secState = STATE_WARRIOR1
                         self.agentManager.warrior.say(warriorTexts[0])
                         t = Timer(2.5, self.warr1)
@@ -112,9 +120,11 @@ class Game():
         self.agentManager.warrior.say(warriorTexts[1])
         t = Timer(2.5, self.warr2)
         t.start()
+        self._secState = STATE_WARRIOR2
 
     def warr2(self, *args):
         self.agentManager.warrior.follow_hero()
+        self._state = STATE_PLAY
 
     def onKickButtonPress(self):
         if self._state == STATE_PLAY:
@@ -131,6 +141,10 @@ class Game():
             saytext = []
             saytext.append('%s' % inst.getObject().getId())
             self.agentManager.getHero().agent.say('\n'.join(saytext), 3500)
+
+    def onOpenButtonPress(self):
+        if self._state == STATE_PLAY:
+            self.dialog.hide_instancemenu()
 
     def onFacePressed(self, face_button):
         if self._state == STATE_PLAY:
@@ -149,6 +163,8 @@ class Game():
             if self.instance_to_agent.has_key(instance.getFifeId()):
                 buttons.append('talkButton')
                 buttons.append('kickButton')
+            if instance.getId() == "sword_crate":
+                buttons.append("openButton")
         self.dialog.show_instancemenu(clickpoint, instance, buttons)
 
     def load(self, map):
