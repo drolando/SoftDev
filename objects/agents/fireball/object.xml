@@ -24,4 +24,16 @@
 			<direction delay="130" dir="315" frames="1"/>
 		</animation>
 	</action>
+	<action id="explosion">
+		<animation atlas="explosion96.png" height="96" width="96">
+			<direction delay="200" dir="0" frames="1"/>
+			<direction delay="200" dir="45" frames="1"/>
+			<direction delay="200" dir="90" frames="1"/>
+			<direction delay="200" dir="135" frames="1"/>
+			<direction delay="200" dir="180" frames="1"/>
+			<direction delay="200" dir="225" frames="1"/>
+			<direction delay="200" dir="270" frames="1"/>
+			<direction delay="200" dir="315" frames="1"/>
+		</animation>
+	</action>
 </object>

@@ -1,4 +1,4 @@
-  QUEST 2:
+  QUEST 3:
     - Reach the shrine in the center of the map
 
   -------------------------------------------------------------------------------  

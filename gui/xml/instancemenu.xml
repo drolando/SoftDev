@@ -5,4 +5,6 @@
 	<Button name="inspectButton" text="Inspect" />
     <Button name="openButton" text="Open" />
     <Button name="attackButton" text="Attack" />
+    <Button name="spellButton" text="Cast spell"/>
+    <Button name="activateButton" text="Activate"/>
 </VBox>
