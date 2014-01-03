@@ -67,3 +67,6 @@ class Warrior(Agent):
 
     def attack(self, location):
         self.agent.actOnce('attack', location)
+
+    def talk(self, target):
+        pass

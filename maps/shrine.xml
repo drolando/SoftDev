@@ -6018,7 +6018,7 @@
 			<i x="33.0" o="bushes:06" z="0.0" y="-33.0" r="0"></i>
 			
 			<i x="8.0" o="girl" y="2.0" r="0" id="NPC:girl" z="0.0"></i>
-			<i x="43.0" o="hippie_priest" z="0.0" id="NPC:priest" y="19.0" r="180"></i>
+			<i x="43.0" o="wizard" z="0.0" id="NPC:wizard" y="19.0" r="180"></i>
 			<i x="41.0" o="fireball" z="0.0" id="NPC:fireball" y="19.0" r="180"></i>
 
 			<i x="43.0" o="warrior" y="20.0" r="0" id="NPC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>

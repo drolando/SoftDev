@@ -4,12 +4,13 @@ from fife.extensions.fife_settings import Setting
 from threading import Timer
 import world
 import agents.agent_manager
+import agents.bee
 from dialog import Dialog
 
 TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
-EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED, EV_QUEST_2 = xrange(5)
-STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1, STATE_SWORD, STATE_BEE2 = xrange(5)
+EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED, EV_QUEST_2, EV_BEE_DEAD = xrange(6)
+STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1, STATE_SWORD, STATE_BEE2, STATE_BEE3, STATE_WIZARD1 = xrange(7)
 
 
 class Game():
@@ -57,6 +58,11 @@ class Game():
         elif ev == EV_QUEST_2:
             self.state = STATE_PAUSE
             self.dialog.show("Play", "misc/game/quest2.txt", self.quest2)
+        elif ev == EV_BEE_DEAD:
+            print "event bee dead"
+            if self.agentManager.beesDead():
+                print "all bees dead"
+                self._secState = STATE_BEE3
         else:
             print "Event not recognized: {}".format(ev)
 
@@ -123,6 +129,21 @@ class Game():
                         self.agentManager.warrior.follow_hero()
                 else:
                     self.agentManager.warrior.say(warriorTexts[2])
+            if instance.getObject().getId() == 'wizard':
+                wizardTexts = TDS.get("rio", "wizardTexts")
+                if self._quest == 1:
+                    self.agentManager.wizard.say(wizardTexts[0])
+                elif self._quest == 2:
+                    if self._secState == STATE_BEE2:
+                        self.agentManager.wizard.say(wizardTexts[0])
+                    elif self._secState == STATE_BEE3:
+                        self._state = STATE_PAUSE
+                        self._secState = STATE_WIZARD1
+                        self.agentManager.wizard.say(wizardTexts[1])
+                        t = Timer(2.0, self.wiz1)
+                        t.start()
+                elif self._quest == 3:
+                    self.agentManager.wizard.say(wizardTexts[3])
 
     def warr1(self, *args):
         warriorTexts = TDS.get("rio", "warriorTexts")
@@ -134,6 +155,16 @@ class Game():
     def warr2(self, *args):
         self.agentManager.warrior.follow_hero()
         self._state = STATE_PLAY
+
+    def wiz1(self, *args):
+        wizardTexts = TDS.get("rio", "wizardTexts")
+        self.agentManager.wizard.say(wizardTexts[2])
+        t = Timer(2.5, self.wiz2)
+        t.start
+
+    def wiz2(self, *args):
+        self._state = STATE_PLAY
+        self.agentManager.wizard.follow_hero()
 
     def onKickButtonPress(self):
         if self._state == STATE_PLAY:
@@ -173,7 +204,7 @@ class Game():
         id = instance.getId()
         if fife_id == self.agentManager.getActiveInstance().getFifeId():
             return
-        if id[:-2] == "NPC:bee:" and self.agentManager.getAgentFromId(fife_id).isDead == True:
+        if id[:-2] == "NPC:bee:" and self.agentManager.getAgentFromId(fife_id).mode == agents.bee._MODE_DEAD:
             return
         # Add the buttons according to circumstances.
         buttons = ['inspectButton']

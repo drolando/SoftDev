@@ -30,18 +30,19 @@ from fireball import Fireball
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW = 0, 1, 2, 3
 
-class Priest(Agent):
-    def __init__(self, settings, model, agentName, layer, uniqInMap=True):
-        super(Priest, self).__init__(settings, model, agentName, layer, uniqInMap)
+class Wizard(Agent):
+    def __init__(self, settings, model, agentName, layer, agentManager, uniqInMap=True):
+        super(Wizard, self).__init__(settings, model, agentName, layer, uniqInMap)
         self.state = _STATE_NONE
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0
+        self.agentManager = agentManager
         self.hero = self.layer.getInstance('PC')
         self.isActive = 0
         self.fireball = Fireball(settings, model, 'NPC:fireball', layer)
         self.fireball.start()
         
-        self.GIRL_SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
+        self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
     def onInstanceActionFinished(self, instance, action):
         self.idle()
@@ -58,11 +59,11 @@ class Priest(Agent):
 
     def follow_hero(self):
         self.state = _STATE_FOLLOW
-        self.agent.follow('run', self.hero, self.GIRL_SPEED)
+        self.agent.follow('run', self.agentManager.getActiveInstance(), self.SPEED)
 
     def run(self, location):
         self.state = _STATE_RUN
-        self.agent.move('run', location, self.GIRL_SPEED)
+        self.agent.move('run', location, self.SPEED)
 
     def cast_spell(self):
         self.agent.actOnce('cast_spell', self.hero.getLocationRef())

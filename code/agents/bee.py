@@ -7,7 +7,7 @@ import code.game
 #TDS = Setting(app_name="rio_de_hola")
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW, _STATE_RAND, _STATE_ATTACK, _STATE_DEAD = xrange(7)
-_MODE_WILD, _MODE_BOX = xrange(2)
+_MODE_WILD, _MODE_BOX, _MODE_DEAD = xrange(3)
 
 class Bee(Agent):
     def __init__(self, settings, model, agentName, layer, agentManager, uniqInMap=True):
@@ -21,7 +21,6 @@ class Bee(Agent):
         self.min_y = int(self.getY() - 8)
         self.max_y = int(self.getY() + 8)
         self.mode = _MODE_WILD
-        self.isDead = False
         
         if agentName[-2:] >= 3:
             self.BEE_SPEED_NORMAL = 0.5 * float(self.settings.get("rio", "TestAgentSpeed"))
@@ -30,11 +29,6 @@ class Bee(Agent):
         self.BEE_SPEED_FAST = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
     def onInstanceActionFinished(self, instance=None, action=None):
-        if self.isDead:
-            if action != None:
-                print "onInstanceActionFinished ", action.getId()
-            else:
-                print "onInstanceActionFinished"
         if self.state == _STATE_RAND:
             self.rand(self.getNextWaypoint())
         elif self.state == _STATE_FOLLOW:
@@ -82,8 +76,9 @@ class Bee(Agent):
 
     def onAttack(self):
         self.state = _STATE_DEAD
-        self.isDead = True
+        self.mode = _MODE_DEAD
         self.agent.actOnce("fall")
+        self.game.event(code.game.EV_BEE_DEAD)
 
     def attack(self):
         print "attack"

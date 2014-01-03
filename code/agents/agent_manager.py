@@ -3,7 +3,7 @@ import math, random
 from code.common.common import ProgrammingError
 from hero import Hero
 from girl import Girl
-from priest import Priest
+from wizard import Wizard
 from beekeeper import Beekeeper
 import code.agents.bee
 from warrior import Warrior
@@ -34,9 +34,9 @@ class AgentManager():
         self.girl.start()
         self.agent_list.append(self.girl)
 
-        self.priest = Priest(TDS, world.model, 'NPC:priest', self.agentlayer)
-        self.game.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
-        self.priest.start()
+        self.wizard = Wizard(TDS, world.model, 'NPC:wizard', self.agentlayer, self)
+        self.game.instance_to_agent[self.wizard.agent.getFifeId()] = self.wizard
+        self.wizard.start()
 
         self.beekeepers = create_anonymous_agents(TDS, world.model, 'beekeeper', self.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
@@ -60,8 +60,13 @@ class AgentManager():
 
     def beesAtHome(self):
         for bee in self.bees:
-            print "-------------------------- bee name: ", bee.agentName[-2:]
-            if bee.agentName[-2:] <= 2 and bee.mode == code.agents.bee._MODE_WILD:
+            if int(bee.agentName[-2:]) <= 3 and bee.mode == code.agents.bee._MODE_WILD:
+                return False
+        return True
+
+    def beesDead(self):
+        for bee in self.bees:
+            if int(bee.agentName[-2:]) >= 4 and bee.mode != code.agents.bee._MODE_DEAD:
                 return False
         return True
 
