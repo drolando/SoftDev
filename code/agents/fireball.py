@@ -24,10 +24,11 @@
 from agent import Agent
 from fife import fife
 from fife.extensions.fife_settings import Setting
+import code.game
 
 #TDS = Setting(app_name="rio_de_hola")
 
-_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW = 0, 1, 2, 3
+_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW, _STATE_EXPLODE = xrange(5)
 
 class Fireball(Agent):
     def __init__(self, settings, model, agentName, layer, uniqInMap=True):
@@ -41,12 +42,18 @@ class Fireball(Agent):
         self.SPEED = 5 * float(self.settings.get("rio", "TestAgentSpeed"))
 
     def onInstanceActionFinished(self, instance, action):
-        self.idle()
+        if self.state == _STATE_RUN:
+            self.explode()
+        elif self.state == _STATE_EXPLODE:
+            self.game.event(code.game.EV_EXPLOSION, self.target)
+            self.idle()
+        else:
+            self.idle()
 
     def onInstanceActionCancelled(self, instance, action):
         print "onInstanceActionCancelled"
         pass
-    
+
     def getNextWaypoint(self):
         self.waypoint_counter += 1
         l = fife.Location(self.layer)
@@ -64,3 +71,15 @@ class Fireball(Agent):
     def start(self):
         self.state = _STATE_IDLE
         self.agent.actOnce('stand')
+
+    def explode(self):
+        self.state = _STATE_EXPLODE
+        self.agent.actOnce('explosion')
+
+    def setTarget(self, target):
+        self.target = target
+
+    def idle(self):
+        self.state = _STATE_IDLE
+        self.agent.actOnce('stand')
+        self.agent.setLocation(self.getNextWaypoint())

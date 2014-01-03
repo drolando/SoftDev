@@ -42,8 +42,9 @@ class Wizard(Agent):
         self.state = _STATE_RUN
         self.agent.move('run', location, self.SPEED)
 
-    def cast_spell(self):
-        self.agent.actOnce('cast_spell', self.hero.getLocationRef())
+    def cast_spell(self, instance):
+        self.agent.actOnce('cast_spell', instance.getLocationRef())
+        self.fireball.setTarget(instance)
         self.fireball.agent.setLocation(self.agent.getLocation())
-        self.fireball.run(self.hero.getLocation())
+        self.fireball.run(instance.getLocation())
 

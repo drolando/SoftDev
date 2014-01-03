@@ -9,7 +9,7 @@ from dialog import Dialog
 
 TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
-EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED, EV_QUEST_2, EV_BEE_DEAD, EV_QUEST_3 = xrange(7)
+EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED, EV_QUEST_2, EV_BEE_DEAD, EV_QUEST_3, EV_EXPLOSION, EV_SHRINE = xrange(9)
 STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1, STATE_SWORD, STATE_BEE2, STATE_BEE3, STATE_WIZARD1, STATE_WIZARD2 = xrange(8)
 
 
@@ -20,6 +20,7 @@ class Game():
         Game.__game = self
         self.applicationListener = None #run.py
         self.instance_to_agent = {}
+        self.engine = engine #needed for exit function
         self.world= world.World(engine)
         self.agentManager = agents.agent_manager.AgentManager(self.world)
         self.dialog = Dialog(self)
@@ -66,6 +67,16 @@ class Game():
         elif ev == EV_QUEST_3:
             self._state = STATE_PAUSE
             self.dialog.show("Play", "misc/game/quest3.txt", self.quest3)
+        elif ev == EV_EXPLOSION:
+            target = args[0]
+            layer = self.world.map.getLayer('TechdemoMapGroundObjectLayer')
+            location = fife.Location(layer)
+            location.setLayerCoordinates(fife.ModelCoordinate(*(16, 2)))
+            target.setLocation(location)
+        elif ev == EV_SHRINE:
+            self._state = STATE_END
+            self._secState = STATE_END
+            self.dialog.show("Exit", "misc/game/end.txt", self.exit)
         else:
             print "Event not recognized: {}".format(ev)
 
@@ -89,6 +100,14 @@ class Game():
         self._quest = 3
         self._state = STATE_PLAY
         self._secState = STATE_WIZARD2
+        #ToDo remove this
+        self.agentManager.addNewPlayableAgent("PC:wizard")
+
+    def exit(self):
+        cmd = fife.Command()
+        cmd.setSource(None)
+        cmd.setCommandType(fife.CMD_QUIT_GAME)
+        self.engine.getEventManager().dispatchCommand(cmd)
 
     def leftClick(self, clickpoint):
         if self._state == STATE_PLAY:
@@ -235,6 +254,16 @@ class Game():
             self.agentManager.warrior.attack(self.dialog.instancemenu.instance.getLocationRef())
             self.agentManager.getAgentFromId(self.dialog.instancemenu.instance.getFifeId()).onAttack()
 
+    def onSpellButtonPress(self):
+        if self._state == STATE_PLAY:
+            self.dialog.hide_instancemenu()
+            instance = self.dialog.instancemenu.instance
+            self.agentManager.wizard.cast_spell(instance)
+
+    def onActivateButtonPress(self):
+        if self._state == STATE_PLAY:
+            self.event(EV_SHRINE)
+
     def onFacePressed(self, face_button):
         if self._state == STATE_PLAY:
             self.agentManager.toggleAgent(self.world, face_button)
@@ -250,20 +279,29 @@ class Game():
         buttons = ['inspectButton']
 
         target_distance = self.agentManager.getActiveInstance().getLocationRef().getLayerDistanceTo(instance.getLocationRef())
-        if target_distance > 4.0:
+        if target_distance > 5.0:
             buttons.append('moveButton')
         else:
             if self.instance_to_agent.has_key(fife_id):
                 buttons.append('talkButton')
                 if (id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3):
                     buttons.append('kickButton')
+
         if self._quest == 1:
             if id == "sword_crate" and self._secState == STATE_BEE1:
                 buttons.append("openButton")
         elif self._quest == 2:
             if (self._secState == STATE_BEE2 and self.agentManager.getActiveAgent().agentName == "PC:warrior"
-                and id[:-2] == "NPC:bee:" and int(id[-2:]) >= 4):
+                and id[:-2] == "NPC:bee:" and int(id[-2:]) >= 4 and target_distance < 4.0):
                 buttons.append('attackButton')
+        elif self._quest == 3:
+            print self.agentManager.getActiveAgent().agentName
+            print instance.getObject().getId()
+            if (self._secState == STATE_WIZARD2 and self.agentManager.getActiveAgent().agentName == "PC:wizard"
+                and instance.getObject().getId() == "trees:05"):
+                buttons.append('spellButton')
+            elif instance.getObject().getId() == "shrine" and target_distance <= 5:
+                buttons.append('activateButton')
         self.dialog.show_instancemenu(clickpoint, instance, buttons)
 
     def load(self, map):

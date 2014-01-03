@@ -77,7 +77,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         self.character_gui.show()
 
         self.game.setApplicationListener(self)
-        self.game.event(code.game.EV_START)
+        self.game.event(code.game.EV_QUEST_3)
         
 
     def keyPressed(self, evt):
