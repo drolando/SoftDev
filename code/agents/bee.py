@@ -15,7 +15,6 @@ class Bee(Agent):
         self.state = _STATE_RAND
         self.agentManager = agentManager
         self.waypoint_counter = 0
-        self.hero = self.layer.getInstance('PC')
         self.min_x = int(self.getX() - 8)
         self.max_x = int(self.getX() + 8)
         self.min_y = int(self.getY() - 8)

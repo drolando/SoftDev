@@ -30,9 +30,9 @@ from fife import fife
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK, _STATE_FOLLOW = xrange(6)
 
-class Hero(Agent):
+class Boy(Agent):
     def __init__(self, settings, model, agentName, layer, uniqInMap=True):
-        super(Hero, self).__init__(settings, model, agentName, layer, uniqInMap)
+        super(Boy, self).__init__(settings, model, agentName, layer, uniqInMap)
         self.state = _STATE_NONE
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0

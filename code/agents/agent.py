@@ -36,6 +36,7 @@ class Agent(fife.InstanceActionListener):
         self.model = model
         self.agentName = agentName
         self.layer = layer
+        self.isActive = False
         if uniqInMap:
             self.agent = layer.getInstance(agentName)
             self.agent.addActionListener(self)
@@ -73,3 +74,6 @@ class Agent(fife.InstanceActionListener):
 
     def say(self, text):
         self.agent.say(text, 2500)
+
+    def talk(self):
+        pass

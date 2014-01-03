@@ -127,8 +127,10 @@ class Game():
                     else:
                         self.agentManager.warrior.say(warriorTexts[1])
                         self.agentManager.warrior.follow_hero()
+                        self.agentManager.addNewPlayableAgent("PC:warrior")
                 else:
                     self.agentManager.warrior.say(warriorTexts[2])
+                    self.agentManager.addNewPlayableAgent("PC:warrior")
             if instance.getObject().getId() == 'wizard':
                 wizardTexts = TDS.get("rio", "wizardTexts")
                 if self._quest == 1:
@@ -154,17 +156,19 @@ class Game():
 
     def warr2(self, *args):
         self.agentManager.warrior.follow_hero()
+        self.agentManager.addNewPlayableAgent("PC:warrior")
         self._state = STATE_PLAY
 
     def wiz1(self, *args):
         wizardTexts = TDS.get("rio", "wizardTexts")
         self.agentManager.wizard.say(wizardTexts[2])
         t = Timer(2.5, self.wiz2)
-        t.start
+        t.start()
 
     def wiz2(self, *args):
         self._state = STATE_PLAY
         self.agentManager.wizard.follow_hero()
+        self.agentManager.addNewPlayableAgent("PC:wizard")
 
     def onKickButtonPress(self):
         if self._state == STATE_PLAY:
@@ -221,7 +225,7 @@ class Game():
             if id == "sword_crate" and self._secState == STATE_BEE1:
                 buttons.append("openButton")
         elif self._quest == 2:
-            if (self._secState == STATE_BEE2 and self.agentManager.getActiveAgent().agentName == "NPC:warrior"
+            if (self._secState == STATE_BEE2 and self.agentManager.getActiveAgent().agentName == "PC:warrior"
                 and id[:-2] == "NPC:bee:" and id[-2:] >= 3):
                 buttons.append('attackButton')
         self.dialog.show_instancemenu(clickpoint, instance, buttons)
