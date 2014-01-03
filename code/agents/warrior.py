@@ -16,7 +16,7 @@ class Warrior(Agent):
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0
         self.isActive = False
-        self._mode = _MODE_ARMED
+        self._mode = _MODE_LIGHT
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 

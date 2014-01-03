@@ -75,5 +75,5 @@ class Agent(fife.InstanceActionListener):
     def say(self, text):
         self.agent.say(text, 2500)
 
-    def talk(self):
+    def talk(self, location):
         pass

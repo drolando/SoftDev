@@ -6021,7 +6021,7 @@
 			<i x="43.0" o="wizard" z="0.0" id="PC:wizard" y="19.0" r="180"></i>
 			<i x="41.0" o="fireball" z="0.0" id="NPC:fireball" y="19.0" r="180"></i>
 
-			<i x="43.0" o="warrior" y="20.0" r="0" id="PC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
+			<i x="43.0" o="warrior" y="-20.0" r="0" id="PC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 
 			<i x="-17.0" o="bee" z="0.0" y="-9.0" r="180" id="NPC:bee:01" visitor_radius="6" visitor_shape="circle"></i>
 			<i x="-15.0" o="bee" z="0.0" y="-11.0" r="180" id="NPC:bee:02" visitor_radius="6" visitor_shape="circle"></i>

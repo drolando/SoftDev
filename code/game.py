@@ -9,8 +9,8 @@ from dialog import Dialog
 
 TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
-EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED, EV_QUEST_2, EV_BEE_DEAD = xrange(6)
-STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1, STATE_SWORD, STATE_BEE2, STATE_BEE3, STATE_WIZARD1 = xrange(7)
+EV_START, EV_ACTION_FINISHED, EV_HIT, EV_BEE_ARRIVED, EV_QUEST_2, EV_BEE_DEAD, EV_QUEST_3 = xrange(7)
+STATE_WARRIOR1, STATE_WARRIOR2, STATE_BEE1, STATE_SWORD, STATE_BEE2, STATE_BEE3, STATE_WIZARD1, STATE_WIZARD2 = xrange(8)
 
 
 class Game():
@@ -41,7 +41,7 @@ class Game():
     def event(self, ev, *args):
         #handle events
         if ev == EV_START:
-            self.state = STATE_START
+            self._state = STATE_START
             self.dialog.show("Start", "misc/game/start.txt", self.start)
         elif ev == EV_HIT:
             self._lives -= 1
@@ -56,13 +56,16 @@ class Game():
             if self.agentManager.beesAtHome():
                 self._secState = STATE_BEE1
         elif ev == EV_QUEST_2:
-            self.state = STATE_PAUSE
+            self._state = STATE_PAUSE
             self.dialog.show("Play", "misc/game/quest2.txt", self.quest2)
         elif ev == EV_BEE_DEAD:
             print "event bee dead"
             if self.agentManager.beesDead():
                 print "all bees dead"
                 self._secState = STATE_BEE3
+        elif ev == EV_QUEST_3:
+            self._state = STATE_PAUSE
+            self.dialog.show("Play", "misc/game/quest3.txt", self.quest3)
         else:
             print "Event not recognized: {}".format(ev)
 
@@ -80,6 +83,12 @@ class Game():
         self._quest = 2
         self._state = STATE_PLAY
         self._secState = STATE_BEE2
+
+    def quest3(self):
+        self.dialog.gameStatusWindow.hide()
+        self._quest = 3
+        self._state = STATE_PLAY
+        self._secState = STATE_WIZARD2
 
     def leftClick(self, clickpoint):
         if self._state == STATE_PLAY:
@@ -146,6 +155,17 @@ class Game():
                         t.start()
                 elif self._quest == 3:
                     self.agentManager.wizard.say(wizardTexts[3])
+            if instance.getObject().getId() == 'chemist':
+                chemistTexts = TDS.get("rio", "chemistTexts")
+                if self._quest == 1:
+                    self.agentManager.chemist.say(chemistTexts[0])
+                elif self._quest == 2:
+                    if self._secState == STATE_WIZARD1:
+                        self._state = STATE_PAUSE
+                        wizardTexts = TDS.get("rio", "wizardTexts")
+                        self.agentManager.wizard.say(wizardTexts[4])
+                        t = Timer(2.5, self.chem1)
+                        t.start()
 
     def warr1(self, *args):
         warriorTexts = TDS.get("rio", "warriorTexts")
@@ -169,6 +189,22 @@ class Game():
         self._state = STATE_PLAY
         self.agentManager.wizard.follow_hero()
         self.agentManager.addNewPlayableAgent("PC:wizard")
+
+    def chem1(self, *args):
+        chemistTexts = TDS.get("rio", "chemistTexts")
+        self.agentManager.chemist.say(chemistTexts[1])
+        t = Timer(2.5, self.chem2)
+        t.start()
+
+    def chem2(self, *args):
+        chemistTexts = TDS.get("rio", "chemistTexts")
+        self.agentManager.chemist.say(chemistTexts[2])
+        t = Timer(2.5, self.chem3)
+        t.start()
+
+    def chem3(self, *args):
+        self._state = STATE_PLAY
+        self.event(EV_QUEST_3)
 
     def onKickButtonPress(self):
         if self._state == STATE_PLAY:
@@ -219,14 +255,14 @@ class Game():
         else:
             if self.instance_to_agent.has_key(fife_id):
                 buttons.append('talkButton')
-                if (id[:-2] != "NPC:bee:" or id[-2:] < 3):
+                if (id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3):
                     buttons.append('kickButton')
         if self._quest == 1:
             if id == "sword_crate" and self._secState == STATE_BEE1:
                 buttons.append("openButton")
         elif self._quest == 2:
             if (self._secState == STATE_BEE2 and self.agentManager.getActiveAgent().agentName == "PC:warrior"
-                and id[:-2] == "NPC:bee:" and id[-2:] >= 3):
+                and id[:-2] == "NPC:bee:" and int(id[-2:]) >= 4):
                 buttons.append('attackButton')
         self.dialog.show_instancemenu(clickpoint, instance, buttons)
 
