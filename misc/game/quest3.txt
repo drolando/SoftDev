@@ -1,0 +1,6 @@
+  QUEST 2:
+    - Reach the shrine in the center of the map
+
+  -------------------------------------------------------------------------------  
+  Hints:
+    - Use the wizard's spell to burn the trees

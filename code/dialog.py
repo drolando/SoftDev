@@ -16,7 +16,7 @@ class Dialog():
 
     def build_instancemenu(self):
         self.hide_instancemenu()
-        dynamicbuttons = ('moveButton', 'talkButton', 'kickButton', 'inspectButton', 'openButton')
+        dynamicbuttons = ('moveButton', 'talkButton', 'kickButton', 'inspectButton', 'openButton', 'attackButton')
         self.instancemenu = pychan.loadXML('gui/xml/instancemenu.xml')
         self.instancemenu.mapEvents({
             'moveButton' : self.game.onMoveButtonPress,
@@ -24,6 +24,7 @@ class Dialog():
             'kickButton' : self.game.onKickButtonPress,
             'inspectButton' : self.game.onInspectButtonPress,
             'openButton' : self.game.onOpenButtonPress,
+            'attackButton' : self.game.onAttackButtonPress,
         })
         for btn in dynamicbuttons:
             self.dynamic_widgets[btn] = self.instancemenu.findChild(name=btn)

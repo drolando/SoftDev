@@ -30,12 +30,12 @@ from fife.extensions.fife_settings import Setting
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW = 0, 1, 2, 3
 
 class Girl(Agent):
-    def __init__(self, settings, model, agentName, layer, uniqInMap=True):
+    def __init__(self, settings, model, agentName, layer, agentManager, uniqInMap=True):
         super(Girl, self).__init__(settings, model, agentName, layer, uniqInMap)
         self.state = _STATE_NONE
+        self.agentManager = agentManager
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0
-        self.hero = self.layer.getInstance('PC')
         self.isActive = False
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
@@ -62,7 +62,7 @@ class Girl(Agent):
 
     def follow_hero(self):
         self.state = _STATE_FOLLOW
-        self.agent.follow('run', self.hero, self.SPEED)
+        self.agent.follow('run', self.agentManager.getActiveInstance(), self.SPEED)
 
     def run(self, location):
         self.state = _STATE_RUN

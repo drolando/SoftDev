@@ -64,3 +64,9 @@ class Warrior(Agent):
     def gotSword(self):
         self._mode = _MODE_ARMED
         self.idle()
+
+    def attack(self, location):
+        self.agent.actOnce('attack', location)
+
+    def talk(self, target):
+        pass

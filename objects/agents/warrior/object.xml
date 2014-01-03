@@ -12,16 +12,16 @@
 			<direction delay="130" dir="225" frames="9"/>
 		</animation>
 	</action>
-	<action id="kick">
-		<animation atlas="warrior.png" height="128" width="128">
-			<direction delay="130" dir="180" frames="9"/>
-			<direction delay="130" dir="135" frames="9"/>
-			<direction delay="130" dir="90" frames="9"/>
-			<direction delay="130" dir="45" frames="9"/>
-			<direction delay="130" dir="0" frames="9"/>
-			<direction delay="130" dir="315" frames="9"/>
-			<direction delay="130" dir="270" frames="9"/>
-			<direction delay="130" dir="225" frames="9"/>
+	<action id="attack">
+		<animation atlas="attack.png" height="128" width="128">
+			<direction delay="130" dir="180" frames="4"/>
+			<direction delay="130" dir="135" frames="4"/>
+			<direction delay="130" dir="90" frames="4"/>
+			<direction delay="130" dir="45" frames="4"/>
+			<direction delay="130" dir="0" frames="4"/>
+			<direction delay="130" dir="315" frames="4"/>
+			<direction delay="130" dir="270" frames="4"/>
+			<direction delay="130" dir="225" frames="4"/>
 		</animation>
 	</action>
 	<action id="run_light">

@@ -30,7 +30,7 @@ from fife.extensions.pychan.internal import get_manager
 from code.common.eventlistenerbase import EventListenerBase
 from fife.extensions.savers import saveMapFile
 from fife.extensions.soundmanager import SoundManager
-from agents.hero import Hero
+from agents.boy import Boy
 from agents.girl import Girl
 from agents.beekeeper import Beekeeper
 from agents.agent_manager import create_anonymous_agents
@@ -128,7 +128,7 @@ class World(EventListenerBase):
             self.cameras[camera_id] = cam
             cam.resetRenderers()
             
-        self.cameras['main'].attach(self.getAgentManager().getHero().agent)
+        self.cameras['main'].attach(self.getAgentManager().getActiveInstance())
 
         # Floating text renderers currntly only support one font.
         # ... so we set that up.
@@ -183,8 +183,6 @@ class World(EventListenerBase):
         # NOTE: We need to explicitly call setLocation, there's a bit of a messup in the Camera code.
         self.cameras['small'].setLocation(self.getAgentManager().getActiveAgentLocation())
         self.cameras['small'].attach(self.getAgentManager().getActiveAgent().agent)
-        '''self.cameras['small'].setLocation(self.hero.agent.getLocation())
-        self.cameras['small'].attach(self.girl.agent)'''
         self.cameras['small'].setOverlayColor(100,0,0,100)
         self.cameras['small'].setEnabled(False)
 

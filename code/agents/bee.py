@@ -6,8 +6,8 @@ import code.game
 
 #TDS = Setting(app_name="rio_de_hola")
 
-_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW, _STATE_RAND, _STATE_ATTACK = xrange(6)
-_MODE_WILD, _MODE_BOX = xrange(2)
+_STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW, _STATE_RAND, _STATE_ATTACK, _STATE_DEAD = xrange(7)
+_MODE_WILD, _MODE_BOX, _MODE_DEAD = xrange(3)
 
 class Bee(Agent):
     def __init__(self, settings, model, agentName, layer, agentManager, uniqInMap=True):
@@ -15,14 +15,16 @@ class Bee(Agent):
         self.state = _STATE_RAND
         self.agentManager = agentManager
         self.waypoint_counter = 0
-        self.hero = self.layer.getInstance('PC')
         self.min_x = int(self.getX() - 8)
         self.max_x = int(self.getX() + 8)
         self.min_y = int(self.getY() - 8)
         self.max_y = int(self.getY() + 8)
         self.mode = _MODE_WILD
         
-        self.BEE_SPEED_NORMAL = 1.5 * float(self.settings.get("rio", "TestAgentSpeed"))
+        if agentName[-2:] >= 3:
+            self.BEE_SPEED_NORMAL = 0.5 * float(self.settings.get("rio", "TestAgentSpeed"))
+        else:
+            self.BEE_SPEED_NORMAL = 1.5 * float(self.settings.get("rio", "TestAgentSpeed"))
         self.BEE_SPEED_FAST = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
     def onInstanceActionFinished(self, instance=None, action=None):
@@ -36,6 +38,8 @@ class Bee(Agent):
                 self.attack()
         elif self.state == _STATE_ATTACK:
             self.rand(self.getNextWaypoint())
+        elif self.state == _STATE_DEAD:
+            self.agent.actOnce("dead")
             
     def start(self):
         self.onInstanceActionFinished()
@@ -51,14 +55,17 @@ class Bee(Agent):
         return l
 
     def follow_hero(self):
+        print "follow"
         self.state = _STATE_FOLLOW
         self.agent.follow('fly', self.agentManager.getActiveInstance(), self.BEE_SPEED_FAST)
 
     def run(self, location):
+        print "run"
         self.state = _STATE_RUN
         self.agent.move('fly', location, self.BEE_SPEED_FAST)
 
     def rand(self, location):
+        print "rand"
         self.state = _STATE_RAND
         self.agent.move('fly', location, self.BEE_SPEED_NORMAL)
 
@@ -66,7 +73,14 @@ class Bee(Agent):
         if self.mode == _MODE_WILD:
             self.follow_hero()
 
+    def onAttack(self):
+        self.state = _STATE_DEAD
+        self.mode = _MODE_DEAD
+        self.agent.actOnce("fall")
+        self.game.event(code.game.EV_BEE_DEAD)
+
     def attack(self):
+        print "attack"
         self.state = _STATE_ATTACK
         self.agent.actOnce('attack', self.agentManager.getActiveInstance().getLocationRef())
         self.agentManager.event('attack')
@@ -82,5 +96,6 @@ class Bee(Agent):
             return True
         return False
 
-    #x -32 -48
-    #y -26 -40
+    def talk(self):
+        if self.state != _STATE_DEAD:
+            self.agent.say("Bzzz", 2000)

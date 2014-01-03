@@ -1,10 +1,11 @@
 from fife import fife
 import math, random
 from code.common.common import ProgrammingError
-from hero import Hero
+from boy import Boy
 from girl import Girl
-from priest import Priest
+from wizard import Wizard
 from beekeeper import Beekeeper
+from chemist import Chemist
 import code.agents.bee
 from warrior import Warrior
 from fireball import Fireball
@@ -17,26 +18,27 @@ class AgentManager():
 
     def __init__(self, world):
         self.player = 0
-        self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png', 'gui/images/hud_boy.png']
+        self.player_faces = ['gui/images/hud_boy.png', 'gui/images/hud_girl.png', 'gui/images/hud_warrior.png', 'gui/images/hud_wizard.png']
         self.agent_list = []
         self.game = code.game.Game.getGame()
 
     def initAgents(self, world):
         self.agentlayer = world.map.getLayer('TechdemoMapGroundObjectLayer')
         world.agentlayer = self.agentlayer
-        self.hero = Hero(TDS, world.model, 'PC', self.agentlayer)
-        self.game.instance_to_agent[self.hero.agent.getFifeId()] = self.hero
-        self.hero.start()
-        self.agent_list.append(self.hero)
+        self.boy = Boy(TDS, world.model, 'PC:boy', self.agentlayer)
+        self.game.instance_to_agent[self.boy.agent.getFifeId()] = self.boy
+        self.boy.start()
+        self.agent_list.append(self.boy)
 
-        self.girl = Girl(TDS, world.model, 'NPC:girl', self.agentlayer)
+        self.girl = Girl(TDS, world.model, 'PC:girl', self.agentlayer, self)
         self.game.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
         self.girl.start()
         self.agent_list.append(self.girl)
 
-        self.priest = Priest(TDS, world.model, 'NPC:priest', self.agentlayer)
-        self.game.instance_to_agent[self.priest.agent.getFifeId()] = self.priest
-        self.priest.start()
+        self.wizard = Wizard(TDS, world.model, 'PC:wizard', self.agentlayer, self)
+        self.game.instance_to_agent[self.wizard.agent.getFifeId()] = self.wizard
+        self.wizard.start()
+        self.agent_list.append(self.wizard)
 
         self.beekeepers = create_anonymous_agents(TDS, world.model, 'beekeeper', self.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
@@ -52,36 +54,48 @@ class AgentManager():
             bee.start()
             self.agent_list.append(bee)
 
-        self.warrior = Warrior(TDS, world.model, 'NPC:warrior', self.agentlayer)
+        self.warrior = Warrior(TDS, world.model, 'PC:warrior', self.agentlayer)
         self.game.instance_to_agent[self.warrior.agent.getFifeId()] = self.warrior
         self.warrior.start()
+        self.agent_list.append(self.warrior)
 
-        self.active_agent = self.hero
+        self.chemist = Chemist(TDS, world.model, 'NPC:chemist', self.agentlayer)
+        self.game.instance_to_agent[self.chemist.agent.getFifeId()] = self.chemist
+        self.chemist.start()
+        self.agent_list.append(self.chemist)
+
+        self.playableAgent = [self.boy, self.girl]
+        self.active_agent = self.boy
 
     def beesAtHome(self):
         for bee in self.bees:
-            print "-------------------------- bee name: ", bee.agentName[-2:]
-            if bee.agentName[-2:] <= 2 and bee.mode == code.agents.bee._MODE_WILD:
+            if int(bee.agentName[-2:]) <= 3 and bee.mode == code.agents.bee._MODE_WILD:
+                return False
+        return True
+
+    def beesDead(self):
+        for bee in self.bees:
+            if int(bee.agentName[-2:]) >= 4 and bee.mode != code.agents.bee._MODE_DEAD:
                 return False
         return True
 
     def reset(self):
-        self.hero, self.girl, self.warrior = None, None, None
+        self.boy, self.girl, self.warrior = None, None, None
 
     def getActiveAgent(self):
-        if self.player == 0:
-            return self.hero
-        elif self.player == 1:
-            return self.girl
-        elif self.player == 2:
-            return self.warrior
-        return None
+        return self.active_agent
 
     def getActiveInstance(self):
+        return self.active_agent.agent
         if self.player == 0:
-            return self.agentlayer.getInstance('PC')
+            return self.agentlayer.getInstance('PC:boy')
         elif self.player == 1:
-            return self.agentlayer.getInstance('NPC:girl')
+            return self.agentlayer.getInstance('PC:girl')
+        elif self.player == 2:
+            return self.agentlayer.getInstance('PC:warrior')
+        elif self.player == 3:
+            return self.agentlayer.getInstance('PC:wizard')
+        return None
 
     def getActiveAgentLocation(self):
         return self.active_agent.agent.getLocation()
@@ -90,13 +104,13 @@ class AgentManager():
         self.getActiveAgent().talk(instance.getLocationRef())
 
     def kick(self, location):
-        self.hero.kick(location)
+        self.boy.kick(location)
 
     def run(self, location):
         self.active_agent.run(location)
 
     def getHero(self):
-        return self.hero
+        return self.active_agent
 
     def getGirl(self):
         return self.girl
@@ -106,33 +120,22 @@ class AgentManager():
             self.game.event('hit')
 
     def toggleAgent(self, world, face_button):
-        self.player = (self.player + 1) % 3
+        self.player = (self.player + 1) % len(self.playableAgent)
 
         face_button.up_image = self.player_faces[self.player]
         face_button.down_image = self.player_faces[self.player]
         face_button.hover_image = self.player_faces[self.player]
-        self.hero.idle()
-        self.girl.idle()
-        self.warrior.idle()
 
-        self.girl.isActive = True if self.player==1 else False
-        self.warrior.isActive = True if self.player==2 else False
-        if self.player == 0:
-            world.cameras['main'].attach(self.hero.agent)
-            world.cameras['small'].attach(self.girl.agent)
-            self.active_agent = self.hero
-        elif self.player == 1:
-            world.cameras['main'].attach(self.girl.agent)
-            world.cameras['small'].attach(self.hero.agent)
-            self.active_agent = self.girl
-        elif self.player == 2:
-            world.cameras['main'].attach(self.warrior.agent)
-            world.cameras['small'].attach(self.hero.agent)
-            self.active_agent = self.warrior
-
-    def rightButtonClicked(self, instances, clickpoint):
-        if (self.player == 0):
-            self.game.show_instancemenu(clickpoint, instances[0])
+        for i in range(len(self.playableAgent)):
+            self.playableAgent[i].idle()
+            if i == self.player:
+                self.playableAgent[i].isActive = True
+                world.cameras['main'].attach(self.playableAgent[i].agent)
+                world.cameras['small'].attach(self.girl.agent)
+                self.active_agent = self.playableAgent[i]
+            else:
+                self.playableAgent[i].isActive = False
+                self.playableAgent[i].follow_hero()
 
     def getAgentFromId(self, fifeId):
         for ag in self.agent_list:
@@ -140,7 +143,13 @@ class AgentManager():
                 return ag
         return None
 
-
+    def addNewPlayableAgent(self, name):
+        for a in self.playableAgent:
+            if a.agentName == name:
+                return
+        for a in self.agent_list:
+            if a.agentName == name:
+                self.playableAgent.append(a)
 
 
 def create_anonymous_agents(settings, model, objectName, layer, agentClass):
