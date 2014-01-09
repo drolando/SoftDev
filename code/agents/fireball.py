@@ -74,6 +74,7 @@ class Fireball(Agent):
 
     def explode(self):
         self.state = _STATE_EXPLODE
+        self.agent.setLocation(self.target.getLocation())
         self.agent.actOnce('explosion')
 
     def setTarget(self, target):

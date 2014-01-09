@@ -3,6 +3,7 @@ from fife.extensions import *
 from fife.extensions.fife_settings import Setting
 from threading import Timer
 import world
+import random
 import agents.agent_manager
 import agents.bee
 from dialog import Dialog
@@ -284,7 +285,7 @@ class Game():
         else:
             if self.instance_to_agent.has_key(fife_id):
                 buttons.append('talkButton')
-                if (id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3):
+                if ((id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3) and self.agentManager.getActiveAgent().agentName == "PC:boy"):
                     buttons.append('kickButton')
 
         if self._quest == 1:
