@@ -1,6 +1,9 @@
 from fife import fife
 from fife.extensions import *
 from fife.extensions.fife_settings import Setting
+from fife.extensions.pychan import widgets
+from fife.fife import Color
+from fife.fife import Font
 from threading import Timer
 import world
 import random
@@ -46,11 +49,11 @@ class Game():
             self._state = STATE_START
             self.dialog.show("Start", "misc/game/start.txt", self.start)
         elif ev == EV_HIT:
-            self._lives -= 1
-            if self._lives <= 0:
-                print "DEAAAAAD"
+            self.agentManager.getActiveAgent().health -= 28
+            self.setHealth()
+            if self.agentManager.getActiveAgent().health <= 0:
                 self.reset()
-                self.event('start')
+                self.event(EV_START) #ToDO add message here!!!
         elif ev == EV_ACTION_FINISHED:
             if args[0] == "warrior":
                 pass
@@ -58,21 +61,20 @@ class Game():
             if self.agentManager.beesAtHome():
                 self._secState = STATE_BEE1
         elif ev == EV_QUEST_2:
-            self._state = STATE_PAUSE
+            self.setState(STATE_PAUSE)
             self.dialog.show("Play", "misc/game/quest2.txt", self.quest2)
         elif ev == EV_BEE_DEAD:
-            print "event bee dead"
             if self.agentManager.beesDead():
-                print "all bees dead"
                 self._secState = STATE_BEE3
         elif ev == EV_QUEST_3:
-            self._state = STATE_PAUSE
+            self.setState(STATE_PAUSE)
             self.dialog.show("Play", "misc/game/quest3.txt", self.quest3)
         elif ev == EV_EXPLOSION:
             target = args[0]
             layer = self.world.map.getLayer('TechdemoMapGroundObjectLayer')
             location = fife.Location(layer)
-            location.setLayerCoordinates(fife.ModelCoordinate(*(16, 2)))
+            #location.setLayerCoordinates(fife.ModelCoordinate(*(16, 2)))
+            location.setLayerCoordinates(fife.ModelCoordinate(*(100, 100)))
             target.setLocation(location)
         elif ev == EV_SHRINE:
             self._state = STATE_END
@@ -88,18 +90,18 @@ class Game():
     def quest1(self):
         self.dialog.gameStatusWindow.hide()
         self._quest = 1
-        self._state = STATE_PLAY
+        self.setState(STATE_PLAY)
 
     def quest2(self):
         self.dialog.gameStatusWindow.hide()
         self._quest = 2
-        self._state = STATE_PLAY
+        self.setState(STATE_PLAY)
         self._secState = STATE_BEE2
 
     def quest3(self):
         self.dialog.gameStatusWindow.hide()
         self._quest = 3
-        self._state = STATE_PLAY
+        self.setState(STATE_PLAY)
         self._secState = STATE_WIZARD2
         #ToDo remove this
         self.agentManager.addNewPlayableAgent("PC:wizard")
@@ -110,6 +112,13 @@ class Game():
         cmd.setCommandType(fife.CMD_QUIT_GAME)
         self.engine.getEventManager().dispatchCommand(cmd)
 
+    def setState(self, state):
+        self._state = state
+        if state == STATE_PLAY:
+            self.statusBar.hide()
+        else:
+            self.statusBar.show()
+
     def leftClick(self, clickpoint):
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
@@ -117,7 +126,7 @@ class Game():
 
     def rightClick(self, instances, clickpoint):
         if self._state == STATE_PLAY:
-            print "selected instances on agent layer: ", [i.getObject().getId() for i in instances]
+            #print "selected instances on agent layer: ", [i.getObject().getId() for i in instances]
             if instances:
                 self.show_instancemenu(clickpoint, instances[0])
 
@@ -148,7 +157,7 @@ class Game():
                 warriorTexts = TDS.get("rio", "warriorTexts")
                 if self._quest == 1:
                     if self._secState == None:
-                        self._state = STATE_PAUSE
+                        self.setState(STATE_PAUSE)
                         self._secState = STATE_WARRIOR1
                         self.agentManager.warrior.say(warriorTexts[0])
                         t = Timer(2.5, self.warr1)
@@ -168,7 +177,7 @@ class Game():
                     if self._secState == STATE_BEE2:
                         self.agentManager.wizard.say(wizardTexts[0])
                     elif self._secState == STATE_BEE3:
-                        self._state = STATE_PAUSE
+                        self.setState(STATE_PAUSE)
                         self._secState = STATE_WIZARD1
                         self.agentManager.wizard.say(wizardTexts[1])
                         t = Timer(2.0, self.wiz1)
@@ -181,11 +190,14 @@ class Game():
                     self.agentManager.chemist.say(chemistTexts[0])
                 elif self._quest == 2:
                     if self._secState == STATE_WIZARD1:
-                        self._state = STATE_PAUSE
+                        self.setState(STATE_PAUSE)
                         wizardTexts = TDS.get("rio", "wizardTexts")
                         self.agentManager.wizard.say(wizardTexts[4])
                         t = Timer(2.5, self.chem1)
                         t.start()
+            if instance.getObject().getId() == 'bee':
+                beeTexts = TDS.get("rio", "beeTexts")
+                self.agentManager.getAgentFromId(instance.getFifeId()).say(beeTexts)
 
     def warr1(self, *args):
         warriorTexts = TDS.get("rio", "warriorTexts")
@@ -197,7 +209,7 @@ class Game():
     def warr2(self, *args):
         self.agentManager.warrior.follow_hero()
         self.agentManager.addNewPlayableAgent("PC:warrior")
-        self._state = STATE_PLAY
+        self.setState(STATE_PLAY)
 
     def wiz1(self, *args):
         wizardTexts = TDS.get("rio", "wizardTexts")
@@ -206,7 +218,7 @@ class Game():
         t.start()
 
     def wiz2(self, *args):
-        self._state = STATE_PLAY
+        self.setState(STATE_PLAY)
         self.agentManager.wizard.follow_hero()
         self.agentManager.addNewPlayableAgent("PC:wizard")
 
@@ -223,7 +235,7 @@ class Game():
         t.start()
 
     def chem3(self, *args):
-        self._state = STATE_PLAY
+        self.setState(STATE_PLAY)
         self.event(EV_QUEST_3)
 
     def onKickButtonPress(self):
@@ -268,6 +280,50 @@ class Game():
     def onFacePressed(self, face_button):
         if self._state == STATE_PLAY:
             self.agentManager.toggleAgent(self.world, face_button)
+            self.setHealth()
+
+    def onHintsButtonPress(self):
+        if self._state == STATE_PLAY:
+            self.setState(STATE_PAUSE)
+            if self._quest == 1:
+                self.dialog.show("Continue", "misc/game/quest1.txt", self.closeDialog)
+            elif self._quest == 2:
+                self.dialog.show("Continue", "misc/game/quest2.txt", self.closeDialog)
+            elif self._quest == 3:
+                self.dialog.show("Continue", "misc/game/quest3.txt", self.closeDialog)
+
+    def closeDialog(self):
+        self.setState(STATE_PLAY)
+        self.dialog.gameStatusWindow.hide()
+
+    def setHealth(self):
+        health = self.agentManager.getActiveAgent().health
+        if health < 0:
+            health = 0
+        if health > 100:
+            health = 100
+
+        if health < 25:
+            self.percBar.foreground_color = Color(128, 0, 0, 255)
+            self.pbar_cont.base_color = Color(128, 0, 0, 100)
+            #self.pbar_cont.foreground_color = Color(128, 0, 0, 30)
+        elif health < 70:
+            self.percBar.foreground_color = Color(251, 155, 0, 255)
+            self.pbar_cont.base_color = Color(251, 155, 0, 100)
+            #self.pbar_cont.foreground_color = Color(251, 155, 0, 30)
+        else:
+            self.percBar.foreground_color  = Color(0, 128, 0, 255)
+            self.pbar_cont.base_color = Color(0, 128, 0, 100)
+            #self.pbar_cont.background_color = Color(0, 128, 0, 30)
+        self.percBar.value = health
+
+    def setPercBar(self, pbar, pbar_cont):
+        self.percBar = pbar
+        self.pbar_cont = pbar_cont
+        pbar.value = 100
+
+    def setStatusBar(self, stbar):
+        self.statusBar = stbar
 
     def show_instancemenu(self, clickpoint, instance):
         fife_id = instance.getFifeId()
@@ -285,7 +341,8 @@ class Game():
         else:
             if self.instance_to_agent.has_key(fife_id):
                 buttons.append('talkButton')
-                if ((id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3) and self.agentManager.getActiveAgent().agentName == "PC:boy"):
+                if ((id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3) and self.agentManager.getActiveAgent().agentName == "PC:boy"
+                     and self._secState == STATE_WARRIOR2):
                     buttons.append('kickButton')
 
         if self._quest == 1:
@@ -307,6 +364,7 @@ class Game():
 
     def load(self, map):
         self.world.load(map)
+        self.setHealth()
 
     def save(self, file):
         self.world.save(file)

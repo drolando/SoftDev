@@ -2,4 +2,8 @@
 	<Button name="quitButton" text="Quit"/>
 	<Button name="aboutButton" text="About"/>
 	<Button name="optionsButton" text="Options"/>
+    <Button name="hintsButton" text="Hints"/>
+    <Container size="310,25">
+        <PercentageBar name="pbar" orientation="0" size="300,15" foreground_color="0,128,0" position="5,5"></PercentageBar>
+    </Container>
 </HBox>

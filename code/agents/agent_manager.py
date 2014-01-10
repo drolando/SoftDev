@@ -115,10 +115,6 @@ class AgentManager():
     def getGirl(self):
         return self.girl
 
-    def event(self, ev):
-        if ev == 'attack':
-            self.game.event('hit')
-
     def toggleAgent(self, world, face_button):
         self.player = (self.player + 1) % len(self.playableAgent)
 

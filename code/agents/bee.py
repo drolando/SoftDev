@@ -80,10 +80,9 @@ class Bee(Agent):
         self.game.event(code.game.EV_BEE_DEAD)
 
     def attack(self):
-        print "attack"
         self.state = _STATE_ATTACK
         self.agent.actOnce('attack', self.agentManager.getActiveInstance().getLocationRef())
-        self.agentManager.event('attack')
+        self.game.event(code.game.EV_HIT)
 
     def nearBeeBoxes(self):
         print "nearBeeBoxes ", self.getX(), " ", self.getY()

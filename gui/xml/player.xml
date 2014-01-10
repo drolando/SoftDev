@@ -1,9 +1,13 @@
-<Container size="100,100" position="10,20" opaque="0" border_size="0">
-	<!-- <Icon name="background_hud1" helptext="You" image="gui/images/hud_boy.png" /> -->
-	<ImageButton name="face"
-		position="5,5"
-		is_focusable="1"
-		up_image="gui/images/hud_boy.png"
-		down_image="gui/images/hud_boy.png"
-		hover_image="gui/images/hud_boy.png" />
+<Container size="150,150" position="10,20" opaque="0" border_size="0">
+    <ImageButton name="face"
+        size="150,150"  
+        position="5,15"
+        is_focusable="1"
+        up_image="gui/images/hud_boy.png"
+        down_image="gui/images/hud_boy.png"
+        hover_image="gui/images/hud_boy.png"
+        background_color="0,0,0" />
+    <Container name="pbar_cont" size="80,8" position="0,112" border_size="2">
+        <PercentageBar name="pbar" orientation="0" size="80,3"></PercentageBar>
+    </Container>
 </Container>

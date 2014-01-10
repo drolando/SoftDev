@@ -5745,7 +5745,7 @@
 			<i x="10.0" o="trees:05" z="0.0" y="6.0" r="0"></i>
 			<i x="9.0" o="trees:05" z="0.0" y="6.0" r="0"></i>
 			<i x="10.0" o="boy" y="10.0" r="0" id="PC:boy" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
-			<i x="10.0" o="girl" y="11.0" r="0" id="PC:girl" z="0.0"></i>
+			<i x="10.0" o="girl" y="11.0" r="0" id="PC:girl" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 			<i x="46.0" o="priest_hut" z="0.0" y="18.0" r="180"></i>
 			<i x="42.0" o="trees:06" z="0.0" y="16.0" r="0"></i>
 			<i x="42.0" o="trees:06" z="0.0" y="14.0" r="0"></i>
@@ -6047,8 +6047,11 @@
 			<i x="33.0" o="bushes:06" z="0.0" y="-36.0" r="0"></i>
 			<i x="33.0" o="bushes:06" z="0.0" y="-33.0" r="0"></i>
 			
-			<i x="43.0" o="wizard" z="0.0" id="PC:wizard" y="19.0" r="180"></i>
-			<i x="41.0" o="fireball" z="0.0" id="NPC:fireball" y="19.0" r="180"></i>
+			<i x="43.0" o="wizard" z="0.0" id="PC:wizard" y="19.0" r="180"  visitor_radius="6" visitor_shape="circle"></i>
+			<i x="41.0" o="fireball" z="10.0" id="NPC:fireball:01" y="19.0" r="180"></i>
+			<i x="41.0" o="fireball" z="10.0" id="NPC:fireball:02" y="19.0" r="180"></i>
+			<i x="41.0" o="fireball" z="10.0" id="NPC:fireball:03" y="19.0" r="180"></i>
+			<i x="41.0" o="fireball" z="10.0" id="NPC:fireball:04" y="19.0" r="180"></i>
 
 			<i x="43.0" o="warrior" y="-20.0" r="0" id="PC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 

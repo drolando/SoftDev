@@ -74,7 +74,11 @@ class Fireball(Agent):
 
     def explode(self):
         self.state = _STATE_EXPLODE
-        self.agent.setLocation(self.target.getLocation())
+        l = self.target.getLocation()
+        c = l.getMapCoordinates()
+        c.z = 0.3
+        l.setMapCoordinates(c)
+        self.agent.setLocation(l)
         self.agent.actOnce('explosion')
 
     def setTarget(self, target):

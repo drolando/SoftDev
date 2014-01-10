@@ -36,6 +36,7 @@
 		<Setting name="warriorTexts" type="list"> We must free the priest. I'll come with you. ; Firstly I need a sword! ; Hey! </Setting>
 		<Setting name="wizardTexts" type="list"> Help me! I'm scared about the bees! ; Thanks! I'll help you to reach the shrine. ; I must find the chemist to retrieve my spells' book ; Now we can burn the trees! :) ; Can you give me back my spell's book? </Setting>
 		<Setting name="chemistTexts" type="list"> Hey. Do you need something? ; Yes sure, I'm almost finished. Only a moment... ; Here. Thank you for having lent it to me! </Setting>
+		<Setting name="beeTexts"> Bzzz </Setting>
 
 		<Setting name="TestCameraPlacement" type="int"> 0 </Setting>
 		<Setting name="TestRotationLayerName" type="str"> TechdemoMapTileLayer  </Setting>

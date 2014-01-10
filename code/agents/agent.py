@@ -42,6 +42,7 @@ class Agent(fife.InstanceActionListener):
             self.agent.addActionListener(self)
         self.SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
         self.game = code.game.Game.getGame()
+        self.health = 100
 
     def onInstanceActionFinished(self, instance, action):
         self.game.event(code.game.Game.ACTION_FINISHED, "agent", action.getId())

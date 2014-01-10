@@ -66,7 +66,8 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         self.rootpanel.mapEvents({
             'quitButton' : self.onQuitButtonPress,
             'aboutButton' : self.onAboutButtonPress,
-            'optionsButton' : TDS.showSettingsDialog
+            'optionsButton' : TDS.showSettingsDialog,
+            'hintsButton' : self.game.onHintsButtonPress,
         })
         self.rootpanel.show()
 
@@ -76,9 +77,16 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         })
         self.character_gui.show()
 
+        self.status_gui = pychan.loadXML('gui/xml/status.xml')
+        self.status_gui.show()
+        self.game.setStatusBar(self.status_gui)
+
         self.game.setApplicationListener(self)
         self.game.event(code.game.EV_QUEST_3)
-        
+
+        pbar_cont = self.character_gui.findChild(name="pbar_cont")
+        pbar = pbar_cont.findChild(name="pbar")
+        self.game.setPercBar(pbar, pbar_cont)
 
     def keyPressed(self, evt):
         print ">>>>>> run.py --> keyPressed ", evt.getKey().getValue()

@@ -31,7 +31,6 @@ class Warrior(Agent):
 
     def onInstanceActionCancelled(self, instance, action):
         print "onInstanceActionCancelled ", action.getId()
-        pass
     
     def getNextWaypoint(self):
         self.waypoint_counter += 1
@@ -63,7 +62,7 @@ class Warrior(Agent):
 
     def gotSword(self):
         self._mode = _MODE_ARMED
-        self.idle()
+        self.follow_hero()
 
     def attack(self, location):
         self.agent.actOnce('attack', location)

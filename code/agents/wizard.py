@@ -16,8 +16,13 @@ class Wizard(Agent):
         self.agentManager = agentManager
         self.hero = self.layer.getInstance('PC')
         self.isActive = 0
-        self.fireball = Fireball(settings, model, 'NPC:fireball', layer)
-        self.fireball.start()
+        self.lastFireballUsed = 0
+        self.fireballs = []
+        for i in range(1, 5):
+            fireball = Fireball(settings, model, 'NPC:fireball:0{}'.format(i), layer)
+            fireball.start()
+            self.fireballs.append(fireball)
+        self.health = 65
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
@@ -44,7 +49,9 @@ class Wizard(Agent):
 
     def cast_spell(self, instance):
         self.agent.actOnce('cast_spell', instance.getLocationRef())
-        self.fireball.setTarget(instance)
-        self.fireball.agent.setLocation(self.agent.getLocation())
-        self.fireball.run(instance.getLocation())
+        self.lastFireballUsed = (self.lastFireballUsed + 1) % len(self.fireballs)
+        fireball = self.fireballs[self.lastFireballUsed]
+        fireball.setTarget(instance)
+        fireball.agent.setLocation(self.agent.getLocation())
+        fireball.run(instance.getLocation())
 
