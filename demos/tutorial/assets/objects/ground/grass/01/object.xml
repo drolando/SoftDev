@@ -1,0 +1,4 @@
+<?fife type="object"?>
+<object id="grass:01" namespace="tutorial1objects" blocking="0" static="1">
+	<image source="225.png" direction="45" />
+</object>
