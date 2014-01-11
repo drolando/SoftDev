@@ -1,0 +1,2 @@
+file /home/daniele/Documents/SoftDev/project/SConstruct,line 276:
+	Configure(confdir = build/.sconf_temp)
