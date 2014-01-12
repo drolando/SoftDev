@@ -764,7 +764,7 @@ GLEE_EXTERN GLboolean _GLEE_SGIX_texture_range;
 #endif
 
 #ifndef GL_ARB_shader_objects
-	typedef void *GLhandleARB;
+	typedef int GLhandleARB;
 	typedef char GLcharARB;
 #endif
 

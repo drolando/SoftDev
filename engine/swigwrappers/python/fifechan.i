@@ -55,5 +55,6 @@ typedef unsigned long long int	uint64_t;
 }
 */
 
-
+%include engine/core/gui/fifechan/lib/fifechanlistener.i
+%include engine/core/gui/fifechan/lib/widgets.i
 
