@@ -6,6 +6,7 @@ from girl import Girl
 from wizard import Wizard
 from beekeeper import Beekeeper
 from chemist import Chemist
+from cage import Cage
 import code.agents.bee
 from warrior import Warrior
 from fireball import Fireball
@@ -45,6 +46,11 @@ class AgentManager():
             self.game.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
             self.agent_list.append(beekeeper)
+
+        self.cage = Cage(TDS, world.model, 'sword_crate', self.agentlayer)
+        self.game.instance_to_agent[self.cage.agent.getFifeId()] = self.cage
+        self.cage.start()
+        self.agent_list.append(self.cage)
 
         self.bees = []
         for i in range(1, 8):

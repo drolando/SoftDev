@@ -23,6 +23,7 @@ class Wizard(Agent):
             fireball.start()
             self.fireballs.append(fireball)
         self.health = 65
+        self.layer = layer
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
@@ -31,7 +32,6 @@ class Wizard(Agent):
 
     def onInstanceActionCancelled(self, instance, action):
         print "onInstanceActionCancelled"
-        pass
     
     def getNextWaypoint(self):
         self.waypoint_counter += 1
@@ -51,6 +51,7 @@ class Wizard(Agent):
         self.agent.actOnce('cast_spell', instance.getLocationRef())
         self.lastFireballUsed = (self.lastFireballUsed + 1) % len(self.fireballs)
         fireball = self.fireballs[self.lastFireballUsed]
+        fireball.agent.refresh()
         fireball.setTarget(instance)
         fireball.agent.setLocation(self.agent.getLocation())
         fireball.run(instance.getLocation())

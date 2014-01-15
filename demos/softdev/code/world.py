@@ -37,6 +37,7 @@ from agents.agent_manager import create_anonymous_agents
 from agents.agent_manager import AgentManager
 import code.game
 from fife.extensions.fife_settings import Setting
+from threading import Timer
 
 TDS = Setting(app_name="rio_de_hola")
 
@@ -69,6 +70,7 @@ class World(EventListenerBase):
 
         self.soundmanager = SoundManager(self.engine)
         self.music = None
+
 
         self.game = code.game.Game.getGame()
 
@@ -104,12 +106,49 @@ class World(EventListenerBase):
         if loader.isLoadable(filename):
             self.map = loader.load(filename)
 
+        
+
         self.getAgentManager().initAgents(self)
         self.initCameras()
 
         #Set background color
         self.engine.getRenderBackend().setBackgroundColor(80,80,255)
 
+        Timer(1, self.loadTrees).start()
+
+    def loadTrees(self):
+        layer = self.map.getLayer('TechdemoMapGroundObjectLayer')
+        for i in range(0, 226):
+            tree = layer.getInstance("tree:{}".format(i))
+            l = tree.getLocation()
+            c = l.getMapCoordinates()
+            if i <= 26:
+                c.x = -2+(i/2.0)
+                c.y = 3
+            elif i <= 40:
+                c.x = -2
+                c.y = -4+((i-27)/2.0)
+            elif i <= 65:
+                c.x = -1.5+((i-41)/2.0)
+                c.y = -4
+            elif i <= 79:
+                c.x = 11
+                c.y = -4+((i-66)/2.0)
+            elif i <= 98:
+                c.x = 0+((i-80)/2.0)
+                c.y = 1.5
+            elif i <= 117:
+                c.x = 0+((i-99)/2.0)
+                c.y = -2.5
+            elif i <= 159:
+                c.x = 7+(((i-118)%5)/2.0)
+                c.y = -2+((i-118)/6)/2.0
+            elif i <= 195:
+                c.x = 0+(((i-160)%5)/2.0)
+                c.y = -2+((i-160)/5)/2.0
+
+            l.setMapCoordinates(c)
+            tree.setLocation(l)
         
     def initCameras(self):
         """

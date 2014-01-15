@@ -20,4 +20,16 @@
 			<direction delay="130" dir="315" frames="9"/>
 		</animation>
 	</action>
+	<action id="stand">
+		<animation atlas="open.png" height="80" width="64">
+			<direction delay="130" dir="0" frames="9"/>
+			<direction delay="130" dir="45" frames="9"/>
+			<direction delay="130" dir="90" frames="9"/>
+			<direction delay="130" dir="135" frames="9"/>
+			<direction delay="130" dir="180" frames="9"/>
+			<direction delay="130" dir="225" frames="9"/>
+			<direction delay="130" dir="270" frames="9"/>
+			<direction delay="130" dir="315" frames="9"/>
+		</animation>
+	</action>
 </object>

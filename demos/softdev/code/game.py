@@ -257,9 +257,10 @@ class Game():
     def onOpenButtonPress(self):
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
+            self.agentManager.cage.open()
             self._secState = STATE_SWORD
             self.agentManager.warrior.gotSword()
-            self.event(EV_QUEST_2)
+            #self.event(EV_QUEST_2)
 
     def onAttackButtonPress(self):
         if self._state == STATE_PLAY:
@@ -326,6 +327,8 @@ class Game():
         self.statusBar = stbar
 
     def show_instancemenu(self, clickpoint, instance):
+        print dir(instance)
+        instance.setBlocking(False)
         fife_id = instance.getFifeId()
         id = instance.getId()
         if fife_id == self.agentManager.getActiveInstance().getFifeId():
@@ -353,12 +356,10 @@ class Game():
                 and id[:-2] == "NPC:bee:" and int(id[-2:]) >= 4 and target_distance < 4.0):
                 buttons.append('attackButton')
         elif self._quest == 3:
-            print self.agentManager.getActiveAgent().agentName
-            print instance.getObject().getId()
             if (self._secState == STATE_WIZARD2 and self.agentManager.getActiveAgent().agentName == "PC:wizard"
                 and instance.getObject().getId() == "trees:05"):
                 buttons.append('spellButton')
-            elif instance.getObject().getId() == "shrine" and target_distance <= 5:
+            elif instance.getObject().getId() == "shrine" and target_distance <= 6:
                 buttons.append('activateButton')
         self.dialog.show_instancemenu(clickpoint, instance, buttons)
 
