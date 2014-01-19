@@ -38,7 +38,7 @@ class Boy(Agent):
         self.waypoint_counter = 0
         self.isActive = True
         self.SPEED = 4 * self.settings.get("rio", "TestAgentSpeed")
-        self.health = 75
+        self.health = 100
 
     def onInstanceActionFinished(self, instance, action):
         if ((self.state in (_STATE_RUN, _STATE_FOLLOW)) or (self.isActive == True)):

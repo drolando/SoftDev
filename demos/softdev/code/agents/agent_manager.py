@@ -26,46 +26,46 @@ class AgentManager():
     def initAgents(self, world):
         self.agentlayer = world.map.getLayer('TechdemoMapGroundObjectLayer')
         world.agentlayer = self.agentlayer
-        self.boy = Boy(TDS, world.model, 'PC:boy', self.agentlayer)
+        self.boy = Boy(TDS, world, 'PC:boy', self.agentlayer)
         self.game.instance_to_agent[self.boy.agent.getFifeId()] = self.boy
         self.boy.start()
         self.agent_list.append(self.boy)
 
-        self.girl = Girl(TDS, world.model, 'PC:girl', self.agentlayer, self)
+        self.girl = Girl(TDS, world, 'PC:girl', self.agentlayer, self)
         self.game.instance_to_agent[self.girl.agent.getFifeId()] = self.girl
         self.girl.start()
         self.agent_list.append(self.girl)
 
-        self.wizard = Wizard(TDS, world.model, 'PC:wizard', self.agentlayer, self)
+        self.wizard = Wizard(TDS, world, 'PC:wizard', self.agentlayer, self)
         self.game.instance_to_agent[self.wizard.agent.getFifeId()] = self.wizard
         self.wizard.start()
         self.agent_list.append(self.wizard)
 
-        self.beekeepers = create_anonymous_agents(TDS, world.model, 'beekeeper', self.agentlayer, Beekeeper)
+        self.beekeepers = create_anonymous_agents(TDS, world, 'beekeeper', self.agentlayer, Beekeeper)
         for beekeeper in self.beekeepers:
             self.game.instance_to_agent[beekeeper.agent.getFifeId()] = beekeeper
             beekeeper.start()
             self.agent_list.append(beekeeper)
 
-        self.cage = Cage(TDS, world.model, 'sword_crate', self.agentlayer)
+        self.cage = Cage(TDS, world, 'sword_crate', self.agentlayer)
         self.game.instance_to_agent[self.cage.agent.getFifeId()] = self.cage
         self.cage.start()
         self.agent_list.append(self.cage)
 
         self.bees = []
         for i in range(1, 8):
-            bee = code.agents.bee.Bee(TDS, world.model, 'NPC:bee:0{}'.format(i), self.agentlayer, self)
+            bee = code.agents.bee.Bee(TDS, world, 'NPC:bee:0{}'.format(i), self.agentlayer, self)
             self.bees.append(bee)
             self.game.instance_to_agent[bee.agent.getFifeId()] = bee
             bee.start()
             self.agent_list.append(bee)
 
-        self.warrior = Warrior(TDS, world.model, 'PC:warrior', self.agentlayer)
+        self.warrior = Warrior(TDS, world, 'PC:warrior', self.agentlayer)
         self.game.instance_to_agent[self.warrior.agent.getFifeId()] = self.warrior
         self.warrior.start()
         self.agent_list.append(self.warrior)
 
-        self.chemist = Chemist(TDS, world.model, 'NPC:chemist', self.agentlayer)
+        self.chemist = Chemist(TDS, world, 'NPC:chemist', self.agentlayer)
         self.game.instance_to_agent[self.chemist.agent.getFifeId()] = self.chemist
         self.chemist.start()
         self.agent_list.append(self.chemist)
@@ -145,6 +145,12 @@ class AgentManager():
                 return ag
         return None
 
+    def getAgentByName(self, name):
+        for ag in self.agent_list:
+            if ag.agentName == name:
+                return ag
+        return None
+
     def addNewPlayableAgent(self, name):
         for a in self.playableAgent:
             if a.agentName == name:
@@ -152,6 +158,10 @@ class AgentManager():
         for a in self.agent_list:
             if a.agentName == name:
                 self.playableAgent.append(a)
+
+    def destroy(self):
+        for a in self.agent_list:
+            a.destroy()
 
 
 def create_anonymous_agents(settings, model, objectName, layer, agentClass):

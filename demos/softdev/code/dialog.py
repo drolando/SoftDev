@@ -3,16 +3,23 @@ from fife.extensions import pychan
 from fife.extensions.pychan.pychanbasicapplication import PychanApplicationBase
 from fife.extensions.pychan.fife_pychansettings import FifePychanSettings
 from fife.extensions.pychan import widgets
+from fife.extensions.pychan.widgets.buttons import Button
 from fife.extensions.pychan.internal import get_manager
 
 
 class Dialog():
+    _gameStatusWindow = None
+
     def __init__(self, game):
         self.instancemenu = None
         self.dynamic_widgets = {}
-        self.gameStatusWindow = pychan.loadXML('gui/xml/game.xml')
         self.game = game
         self.agentManager = game.agentManager
+
+    def getGameStatusWindow(self):
+        if self._gameStatusWindow == None:
+            self._gameStatusWindow = pychan.loadXML('gui/xml/game.xml')
+        return self._gameStatusWindow
 
     def build_instancemenu(self):
         self.hide_instancemenu()
@@ -49,8 +56,16 @@ class Dialog():
         if self.instancemenu:
             self.instancemenu.hide()
 
-    def show(self, buttonText, text, callback):
-        self.gameStatusWindow.mapEvents({ 'playButton' : callback })
-        self.gameStatusWindow.findChild(name='playButton').text = buttonText
-        self.gameStatusWindow.distributeData({ 'gameStatus' : open(text).read() })
-        self.gameStatusWindow.show()
+    def show(self, buttonText, text, callback, cancelText=None, callbackCancel=None):
+        self.getGameStatusWindow().findChild(name='playButton').text = buttonText
+        self.getGameStatusWindow().distributeData({ 'gameStatus' : open(text).read() })
+        if cancelText == None or callbackCancel == None:
+            self.getGameStatusWindow().mapEvents({ 'playButton' : callback })
+        else:
+            cancel = Button(name="cancelButton", text=cancelText)
+            self.getGameStatusWindow().addChild(cancel)
+            self.getGameStatusWindow().mapEvents({ 'playButton' : callback, 'cancelButton' : callbackCancel })
+        self.getGameStatusWindow().show()
+
+    def hide(self):
+        self.getGameStatusWindow().hide()
