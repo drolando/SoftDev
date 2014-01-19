@@ -2,6 +2,8 @@ from agent import Agent
 from fife import fife
 from fife.extensions.fife_settings import Setting
 from fireball import Fireball
+from threading import Timer
+from fife.extensions.soundmanager import SoundManager
 
 #TDS = Setting(app_name="rio_de_hola")
 
@@ -23,9 +25,16 @@ class Wizard(Agent):
             fireball.start()
             self.fireballs.append(fireball)
         self.health = 65
+        self.magic = 100
         self.layer = layer
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
+        self.SPELL_COST = 15
+
+        self.t = Timer(1, self.addMagic)
+        self.t.start()
+
+        self.soundmanager = SoundManager(model.engine)
 
     def onInstanceActionFinished(self, instance, action):
         self.idle()
@@ -48,11 +57,37 @@ class Wizard(Agent):
         self.agent.move('run', location, self.SPEED)
 
     def cast_spell(self, instance):
-        self.agent.actOnce('cast_spell', instance.getLocationRef())
-        self.lastFireballUsed = (self.lastFireballUsed + 1) % len(self.fireballs)
-        fireball = self.fireballs[self.lastFireballUsed]
-        fireball.agent.refresh()
-        fireball.setTarget(instance)
-        fireball.agent.setLocation(self.agent.getLocation())
-        fireball.run(instance.getLocation())
+        if (self.magic >= self.SPELL_COST):
+            self.agent.actOnce('cast_spell', instance.getLocationRef())
+            self.lastFireballUsed = (self.lastFireballUsed + 1) % len(self.fireballs)
+            fireball = self.fireballs[self.lastFireballUsed]
+            fireball.agent.refresh()
+            fireball.setTarget(instance)
+            fireball.agent.setLocation(self.agent.getLocation())
+            fireball.run(instance.getLocation())
+            self.magic -= self.SPELL_COST
+            self.game.setMagic()
+            if self.t == None:
+                self.addMagic()
 
+            '''self.music = self.soundmanager.createSoundEmitter('/home/daniele/Documents/SoftDev/sdproject/demos/softdev/code/agents/fire.ogg')
+            self.music.looping = True
+            self.music.gain = 128 # volume: da 0 a 255
+
+            self.music.play()'''
+
+
+    def addMagic(self):
+        if self.magic < 100:
+            self.magic += 2
+            self.game.setMagic()
+            self.t = Timer(1, self.addMagic)
+            self.t.start()
+        else:
+            self.t = None
+
+    def destroy(self):
+        if self.t != None:
+            self.t.cancel()
+        self.magic = 100
+        self.t = None

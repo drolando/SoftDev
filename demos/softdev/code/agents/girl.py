@@ -37,7 +37,7 @@ class Girl(Agent):
         self.waypoints = ((67, 80), (75, 44))
         self.waypoint_counter = 0
         self.isActive = False
-        self.health = -20
+        self.health = 100
         
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 

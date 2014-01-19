@@ -2,24 +2,29 @@ from fife import fife
 from fife.fife import IAnimationLoader
 from code.common.common import ProgrammingError
 import code.game
+from fife.extensions.soundmanager import SoundManager
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_KICK, _STATE_TALK = xrange(5)
+_MODE_NONE = 0
 
 class Agent(fife.InstanceActionListener):
     
-    def __init__(self, settings, model, agentName, layer, uniqInMap=True):
+    def __init__(self, settings, world, agentName, layer, uniqInMap=True):
         fife.InstanceActionListener.__init__(self)
         self.settings = settings
-        self.model = model
+        self.model = world.model
         self.agentName = agentName
         self.layer = layer
         self.isActive = False
+        self._mode = _MODE_NONE
         if uniqInMap:
             self.agent = layer.getInstance(agentName)
             self.agent.addActionListener(self)
         self.SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
         self.game = code.game.Game.getGame()
         self.health = 100
+        self.magic = 0
+        
 
     def onInstanceActionFinished(self, instance, action):
         self.game.event(code.game.Game.ACTION_FINISHED, "agent", action.getId())
@@ -54,4 +59,7 @@ class Agent(fife.InstanceActionListener):
         self.agent.say(text, 2500)
 
     def talk(self, location):
+        pass
+
+    def destroy(self):
         pass

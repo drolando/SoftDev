@@ -42,7 +42,11 @@ class Bee(Agent):
             self.agent.actOnce("dead")
             
     def start(self):
-        self.onInstanceActionFinished()
+        if self.nearBeeBoxes() == True:
+            self.rand(self.getNextWaypoint())
+            #self.game.event(code.game.EV_BEE_ARRIVED)
+        else:
+            self.onInstanceActionFinished()
 
     def onInstanceActionCancelled(self, instance, action):
         print "onInstanceActionCancelled: ", action.getId()

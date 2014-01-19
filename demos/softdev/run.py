@@ -82,35 +82,36 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         self.game.setStatusBar(self.status_gui)
 
         self.game.setApplicationListener(self)
-        self.game.event(code.game.EV_QUEST_3)
 
-        pbar_cont = self.character_gui.findChild(name="pbar_cont")
-        pbar = pbar_cont.findChild(name="pbar")
-        self.game.setPercBar(pbar, pbar_cont)
+        health_cont = self.character_gui.findChild(name="health_cont")
+        health_bar = health_cont.findChild(name="health_bar")
+        magic_bar = health_cont.findChild(name="magic_bar")
+        self.game.setPercBar(health_bar, magic_bar, health_cont)
 
     def keyPressed(self, evt):
-        print ">>>>>> run.py --> keyPressed ", evt.getKey().getValue()
         keyval = evt.getKey().getValue()
         keystr = evt.getKey().getAsString().lower()
         consumed = False
         if keyval == fife.Key.ESCAPE:
-            self.quit = True
-            evt.consume()
+            print "######################### keyPressed ##########################"
+            #self.quit = True
+            #consumed = True
+            self.game.show_save_dialog()
+            #evt.consume()
         elif keystr == 'p':
             self.engine.getRenderBackend().captureScreen('screenshot.png')
             evt.consume()
 
     def onCommand(self, command):
-        print ">>>>>> run.py --> onCommand"
         if command.getCommandType() == fife.CMD_QUIT_GAME:
+            print "####################### onCommand ############################"
             self.quit = True
+            consumed = True
+            self.game.show_save_dialog()
             command.consume()
 
     def onQuitButtonPress(self):
-        cmd = fife.Command()
-        cmd.setSource(None)
-        cmd.setCommandType(fife.CMD_QUIT_GAME)
-        self.engine.getEventManager().dispatchCommand(cmd)
+        self.game.show_save_dialog()
 
     def onAboutButtonPress(self):
         if not self.aboutWindow:
@@ -130,6 +131,7 @@ class IslandDemo(PychanApplicationBase):
         self.game = code.game.Game(self.engine)
         self.listener = ApplicationListener(self.engine, self.game)
         self.game.load(str(TDS.get("rio", "MapFile")))
+        self.game.event(code.game.EV_START)
 
     def createListener(self):
         pass # already created in constructor
