@@ -23,6 +23,10 @@ class AgentManager():
         self.agent_list = []
         self.game = code.game.Game.getGame()
 
+    """
+        Intializes all the agents. All these instances are also added to the self.agent_list list
+        to simplify the searches by name or id.
+    """
     def initAgents(self, world):
         self.agentlayer = world.map.getLayer('TechdemoMapGroundObjectLayer')
         world.agentlayer = self.agentlayer
@@ -73,12 +77,18 @@ class AgentManager():
         self.playableAgent = [self.boy, self.girl]
         self.active_agent = self.boy
 
+    """
+        This method checks if the first 3 bees are near the beeboxes.
+    """
     def beesAtHome(self):
         for bee in self.bees:
             if int(bee.agentName[-2:]) <= 3 and bee.mode == code.agents.bee._MODE_WILD:
                 return False
         return True
 
+    """
+        This method checks if the bees whith id >= 4 are all dead.
+    """
     def beesDead(self):
         for bee in self.bees:
             if int(bee.agentName[-2:]) >= 4 and bee.mode != code.agents.bee._MODE_DEAD:
@@ -88,32 +98,23 @@ class AgentManager():
     def reset(self):
         self.boy, self.girl, self.warrior = None, None, None
 
+    """
+        Returns the current active agent.
+    """
     def getActiveAgent(self):
         return self.active_agent
 
+    """
+        Returns the FIFE instance of the current active agent.
+    """
     def getActiveInstance(self):
         return self.active_agent.agent
-        if self.player == 0:
-            return self.agentlayer.getInstance('PC:boy')
-        elif self.player == 1:
-            return self.agentlayer.getInstance('PC:girl')
-        elif self.player == 2:
-            return self.agentlayer.getInstance('PC:warrior')
-        elif self.player == 3:
-            return self.agentlayer.getInstance('PC:wizard')
-        return None
 
+    """
+        Returns the current active agent's location.
+    """
     def getActiveAgentLocation(self):
         return self.active_agent.agent.getLocation()
-
-    def talk(self, instance):
-        self.getActiveAgent().talk(instance.getLocationRef())
-
-    def kick(self, location):
-        self.boy.kick(location)
-
-    def run(self, location):
-        self.active_agent.run(location)
 
     def getHero(self):
         return self.active_agent
@@ -121,6 +122,10 @@ class AgentManager():
     def getGirl(self):
         return self.girl
 
+    """
+        Changes the current active agent. The list self.playableAgent contains all the
+        currently playable characters.
+    """
     def toggleAgent(self, world, face_button):
         self.player = (self.player + 1) % len(self.playableAgent)
 
@@ -139,18 +144,27 @@ class AgentManager():
                 self.playableAgent[i].isActive = False
                 self.playableAgent[i].follow_hero()
 
+    """
+        Returns the Agent to the agent with a specific fifeId.
+    """
     def getAgentFromId(self, fifeId):
         for ag in self.agent_list:
             if ag.agent.getFifeId() == fifeId:
                 return ag
         return None
 
+    """
+        Returns the Agent to the agent with a specific name.
+    """
     def getAgentByName(self, name):
         for ag in self.agent_list:
             if ag.agentName == name:
                 return ag
         return None
 
+    """
+        Adds a new playable agent if it's not yet present inside the playableAgent list.
+    """
     def addNewPlayableAgent(self, name):
         for a in self.playableAgent:
             if a.agentName == name:
@@ -158,6 +172,8 @@ class AgentManager():
         for a in self.agent_list:
             if a.agentName == name:
                 self.playableAgent.append(a)
+                if a.agentName != self.active_agent.agentName:
+                    a.follow_hero()
 
     def destroy(self):
         for a in self.agent_list:

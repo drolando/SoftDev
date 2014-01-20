@@ -27,7 +27,6 @@ from fife.extensions.pychan.internal import get_manager
 
 class EventListenerBase(fife.IKeyListener, fife.ICommandListener, fife.IMouseListener, fife.ConsoleExecuter):
 	def __init__(self, engine, regKeys=False, regCmd=False, regMouse=False, regConsole=False, regWidget=False):
-		print ">>>>> EventListenerBase --> __init__"
 		self.eventmanager = engine.getEventManager()
 
 		fife.IKeyListener.__init__(self)
