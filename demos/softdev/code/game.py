@@ -11,7 +11,8 @@ import agents.agent_manager
 import agents.bee
 from dialog import Dialog
 from ConfigParser import SafeConfigParser
-import sys
+import sys, os
+import datetime
 
 TDS = Setting(app_name="rio_de_hola")
 STATE_START, STATE_PLAY, STATE_PAUSE, STATE_END = xrange(4)
@@ -112,18 +113,31 @@ class Game():
         The following functions allow the user to save, load and delete the game status.
     """
     def show_save_dialog(self):
-        self.dialog.show("Yes", "misc/game/save.txt", self.saveStatus, "No", self.deleteStatus)
+        if self._state == STATE_PLAY:
+            #self.dialog.show("Yes", "misc/game/save.txt", self.saveStatus, "No", self.deleteStatus)
+            self.setState(STATE_PAUSE)
+            self.dialog.show_exit_menu(self.saveStatus, self.loadButtonPress, self.exit)
+        else:
+            self.dialog.hide_exit_menu()
+            self.dialog.hide_load_menu()
+            self.setState(STATE_PLAY)
+
 
     def exit(self):
-        self.agentManager.destroy()
         cmd = fife.Command()
         cmd.setSource(None)
         cmd.setCommandType(fife.CMD_QUIT_GAME)
         self.engine.getEventManager().dispatchCommand(cmd)
 
     def saveStatus(self):
+        name_tmp = "./saves/{:s}".format(datetime.datetime.now().strftime("%Y-%m-%d_%H:%M"))
+        name = name_tmp
+        i = 1
+        while os.path.exists(name):
+            name = "{:s}_{:d}".format(name_tmp, i)
+            i += 1
+
         Config = SafeConfigParser()
-        cfg = open("./conf", "w")
         Config.add_section("GAME")
         Config.set("GAME", "quest", str(self._quest))
         Config.set("GAME", "state", str(self._state))
@@ -137,9 +151,14 @@ class Game():
         for b in self.agentManager.bees:
             c = b.agent.getLocation().getMapCoordinates()
             Config.set("BEES", b.agentName.replace(':','_'), "{:f};{:f};{:d};{:d}".format(c.x*2, c.y*2, int(b.state), int(b.mode)))
+        cfg = open(name, "w")
         Config.write(cfg)
         cfg.close()
-        self.exit()
+        cfg = open("./conf", "w")
+        Config.write(cfg)
+        cfg.close()
+        self.setState(STATE_PLAY)
+        self.dialog.hide_exit_menu()
 
     def deleteStatus(self):
         Config = SafeConfigParser()
@@ -147,9 +166,25 @@ class Game():
         cfg.close()
         self.exit()
 
-    def loadStatus(self):
+    def loadButtonPress(self):
+        list = []
+        tmp_list = []
+        for fn in os.listdir("./saves/"):
+            tmp_list.append(fn)
+        tmp_list.sort(reverse=True)
+        i = 1
+        for fn in tmp_list:
+            obj = LoadObject(self, fn)
+            list.append(obj)
+            i += 1
+            if i > 8:
+                break
+        self.dialog.hide_exit_menu()
+        self.dialog.show_load_menu(list)
+
+    def loadStatus(self, name="./conf"):
         config = SafeConfigParser()
-        config.read("./conf")
+        config.read(name)
         try:
             if config.has_section("GAME"):
                 self._quest = config.getint("GAME", "quest")
@@ -190,6 +225,8 @@ class Game():
             print "--- Please, restart again the game ---"
             print "###################################################################################"
             self.deleteStatus()
+        self.setState(STATE_PLAY)
+        self.dialog.hide_exit_menu()
 
     """
         This function set the current state: if it's STATE_PAUSE it shows the PAUSE label below the
@@ -485,3 +522,11 @@ class Game():
 
     def pump(self):
         self.world.pump()
+
+class LoadObject():
+    def __init__(self, game, name):
+        self.name = name
+        self.game = game
+    def callback(self):
+        self.game.loadStatus("./saves/{:s}".format(self.name))
+        self.game.dialog.hide_load_menu()
