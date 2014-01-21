@@ -15,11 +15,18 @@ class Dialog():
         self.dynamic_widgets = {}
         self.game = game
         self.agentManager = game.agentManager
+        self._exitWindow = None
+        self._load_menu = None
 
     def getGameStatusWindow(self):
         if self._gameStatusWindow == None:
             self._gameStatusWindow = pychan.loadXML('gui/xml/game.xml')
         return self._gameStatusWindow
+
+    def getExitWindow(self):
+        if self._exitWindow == None:
+            self._exitWindow = pychan.loadXML('gui/xml/exit.xml')
+        return self._exitWindow
 
     def build_instancemenu(self):
         self.hide_instancemenu()
@@ -69,3 +76,29 @@ class Dialog():
 
     def hide(self):
         self.getGameStatusWindow().hide()
+
+    def show_exit_menu(self, saveCallback, loadCallback, exitCallback):
+        self.getExitWindow().mapEvents({'saveButton' : saveCallback, 'loadButton' : loadCallback, 'exitButton' : exitCallback})
+        self.getExitWindow().show()
+
+    def hide_exit_menu(self):
+        self.getExitWindow().hide()
+
+    def show_load_menu(self, buttons):
+        self._load_menu = pychan.loadXML('gui/xml/load.xml')
+        ev = {}
+        i = 0
+        cont = self._load_menu.findChild(name="cont")
+        for b in buttons:
+            btn = Button(name=b.name, text=b.name, min_size=[200,30], position=[0,i])
+            i += 33
+            self._load_menu.findChild(name="cont").addChild(btn)
+            ev[b.name] = b.callback
+        self._load_menu.mapEvents(ev)
+        self._load_menu.show()
+
+    def hide_load_menu(self):
+        if self._load_menu != None:
+            self._load_menu.hide()
+
+
