@@ -114,7 +114,7 @@ class World(EventListenerBase):
         #Set background color
         self.engine.getRenderBackend().setBackgroundColor(80,80,255)
 
-        Timer(1, self.loadTrees).start()
+        Timer(0.1, self.loadTrees).start()
 
     def loadTrees(self):
         layer = self.map.getLayer('TechdemoMapGroundObjectLayer')
@@ -260,6 +260,8 @@ class World(EventListenerBase):
         elif keystr == 's':
             c = self.cameras['small']
             c.setEnabled(not c.isEnabled())
+        elif keystr == 'f':
+            self.game.onFacePress()
         elif keystr == 'r':
             self.model.deleteMaps()
             self.load(self.filename)

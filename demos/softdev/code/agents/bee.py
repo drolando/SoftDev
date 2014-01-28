@@ -37,7 +37,8 @@ class Bee(Agent):
             else:
                 self.attack()
         elif self.state == _STATE_ATTACK:
-            self.rand(self.getNextWaypoint())
+            self.follow_hero()
+            #self.rand(self.getNextWaypoint())
         elif self.state == _STATE_DEAD:
             self.agent.actOnce("dead")
             
@@ -48,9 +49,6 @@ class Bee(Agent):
         else:
             self.onInstanceActionFinished()
 
-    def onInstanceActionCancelled(self, instance, action):
-        print "onInstanceActionCancelled: ", action.getId()
-    
     def getNextWaypoint(self):
         self.waypoint_counter += 1
         l = fife.Location(self.layer)

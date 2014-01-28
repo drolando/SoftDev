@@ -20,7 +20,6 @@ class Fireball(Agent):
         if self.state == _STATE_RUN:
             self.explode()
         elif self.state == _STATE_EXPLODE:
-            #self.game.event(code.game.EV_EXPLOSION, self.target)
             self.layer.deleteInstance(self.target)
             self.layer.setWalkable(True)
             self.idle()

@@ -42,8 +42,10 @@ class Girl(Agent):
         self.SPEED = 3 * float(self.settings.get("rio", "TestAgentSpeed"))
 
     def onInstanceActionFinished(self, instance, action):
-        if ((self.state in (_STATE_RUN, _STATE_FOLLOW)) or (self.isActive == True)):
+        if ((self.state == _STATE_RUN) or (self.isActive == True)):
             self.idle()
+        elif self.state == _STATE_FOLLOW:
+            self.follow_hero()
         else:
             if self.waypoint_counter % 3:
                 self.waypoint_counter += 1
@@ -51,10 +53,6 @@ class Girl(Agent):
             else:
                 self.run(self.getNextWaypoint())
 
-    def onInstanceActionCancelled(self, instance, action):
-        print "onInstanceActionCancelled"
-        pass
-    
     def getNextWaypoint(self):
         self.waypoint_counter += 1
         l = fife.Location(self.layer)

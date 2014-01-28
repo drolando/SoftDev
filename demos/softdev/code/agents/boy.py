@@ -41,15 +41,11 @@ class Boy(Agent):
         self.health = 100
 
     def onInstanceActionFinished(self, instance, action):
-        if ((self.state in (_STATE_RUN, _STATE_FOLLOW)) or (self.isActive == True)):
-            self.idle()
+        if self.state == _STATE_FOLLOW:
+            self.follow_hero()
         else:
-            if self.waypoint_counter % 3:
-                self.waypoint_counter += 1
-                self.follow_hero()
-            else:
-                self.run(self.getNextWaypoint())
-
+            self.idle()
+        
     def getNextWaypoint(self):
         self.waypoint_counter += 1
         l = fife.Location(self.layer)
@@ -60,7 +56,6 @@ class Boy(Agent):
         pass
     
     def run(self, location):
-        print "------- run ", location
         self.state = _STATE_RUN
         self.agent.move('run', location, self.SPEED)
 
