@@ -40,6 +40,6 @@
 
 		<Setting name="TestCameraPlacement" type="int"> 0 </Setting>
 		<Setting name="TestRotationLayerName" type="str"> TechdemoMapTileLayer  </Setting>
-		<Setting name="TestAgentSpeed" type="float"> 0.8 </Setting>
+		<Setting name="TestAgentSpeed" type="float"> 1.2 </Setting>
 	</Module>
 </Settings>

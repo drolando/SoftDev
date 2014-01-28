@@ -37,11 +37,11 @@ class Wizard(Agent):
         self.soundmanager = SoundManager(model.engine)
 
     def onInstanceActionFinished(self, instance, action):
-        self.idle()
+        if self.state == _STATE_FOLLOW:
+            self.follow_hero()
+        else:
+            self.idle()
 
-    def onInstanceActionCancelled(self, instance, action):
-        print "onInstanceActionCancelled"
-    
     def getNextWaypoint(self):
         self.waypoint_counter += 1
         l = fife.Location(self.layer)

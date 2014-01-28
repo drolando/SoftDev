@@ -29,9 +29,6 @@ class Warrior(Agent):
         elif self.state == _STATE_RUN:
             self.idle()
 
-    def onInstanceActionCancelled(self, instance, action):
-        print "onInstanceActionCancelled ", action.getId()
-    
     def getNextWaypoint(self):
         self.waypoint_counter += 1
         l = fife.Location(self.layer)

@@ -20,6 +20,7 @@ class Agent(fife.InstanceActionListener):
         if uniqInMap:
             self.agent = layer.getInstance(agentName)
             self.agent.addActionListener(self)
+            self.position = self.agent.getLocation()
         self.SPEED = 2.5 * float(self.settings.get("rio", "TestAgentSpeed"))
         self.game = code.game.Game.getGame()
         self.health = 100
@@ -30,10 +31,10 @@ class Agent(fife.InstanceActionListener):
         self.game.event(code.game.Game.ACTION_FINISHED, "agent", action.getId())
 
     def onInstanceActionCancelled(self, instance, action):
-        raise ProgrammingError('No OnActionFinished defined for Agent')
+        pass
 
     def onInstanceActionFrame(self, instance, action, frame):
-        raise ProgrammingError('No OnActionFrame defined for Agent')    
+        pass
 
     def start(self):
         self.idle()
@@ -63,3 +64,8 @@ class Agent(fife.InstanceActionListener):
 
     def destroy(self):
         pass
+
+    def reset(self):
+        if self.position != None and self.agent != None:
+            self.agent.setLocation(self.position)
+        self.start()

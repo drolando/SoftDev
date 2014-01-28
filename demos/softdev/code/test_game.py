@@ -38,7 +38,7 @@ class GameTests(unittest.TestCase):
         assert self.game.dialog.show.called
 
     def testSaveLoad(self):
-        self.game._state = 1
+        self.game._old_state = 1
         self.game._secState = 2
         self.game._quest = 3
         c = MagicMock()

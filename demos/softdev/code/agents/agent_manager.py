@@ -74,8 +74,8 @@ class AgentManager():
         self.chemist.start()
         self.agent_list.append(self.chemist)
 
-        self.playableAgent = [self.boy, self.girl]
-        self.active_agent = self.boy
+        self.playableAgent = []
+        self.reset()
 
     """
         This method checks if the first 3 bees are near the beeboxes.
@@ -96,7 +96,11 @@ class AgentManager():
         return True
 
     def reset(self):
-        self.boy, self.girl, self.warrior = None, None, None
+        for p in self.playableAgent:
+            p.reset()
+        self.playableAgent = [self.boy, self.girl]
+        self.active_agent = self.boy
+
 
     """
         Returns the current active agent.

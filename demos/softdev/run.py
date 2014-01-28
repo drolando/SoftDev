@@ -87,6 +87,8 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         health_bar = health_cont.findChild(name="health_bar")
         magic_bar = health_cont.findChild(name="magic_bar")
         self.game.setPercBar(health_bar, magic_bar, health_cont)
+        self.game.setFaceButton(self.character_gui.findChild(name="face"))
+
 
     def keyPressed(self, evt):
         keyval = evt.getKey().getValue()
@@ -121,8 +123,7 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         self.aboutWindow.show()
 
     def onFacePressed(self):
-        face_button = self.character_gui.findChild(name="face")
-        self.game.onFacePressed(face_button)
+        self.game.onFacePress()
 
 
 class IslandDemo(PychanApplicationBase):

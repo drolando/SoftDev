@@ -101,4 +101,9 @@ class Dialog():
         if self._load_menu != None:
             self._load_menu.hide()
 
+    def exit_load_visible(self):
+        if ((self._load_menu != None and self._load_menu.isVisible()) or (self.getExitWindow().isVisible())):
+            return True
+        return False
+
 

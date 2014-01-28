@@ -58,7 +58,7 @@ class Game():
             else:
                 self.setState(STATE_PLAY)
         elif ev == EV_HIT:
-            self.agentManager.getActiveAgent().health -= 28
+            self.agentManager.getActiveAgent().health -= 10
             self.setHealth()
             if self.agentManager.getActiveAgent().health <= 0:
                 self.deleteStatus() #ToDO add message here!!!
@@ -114,13 +114,15 @@ class Game():
     """
     def show_save_dialog(self):
         if self._state == STATE_PLAY:
-            #self.dialog.show("Yes", "misc/game/save.txt", self.saveStatus, "No", self.deleteStatus)
+            self._old_state = self._state
             self.setState(STATE_PAUSE)
+            self.dialog.hide_instancemenu()
             self.dialog.show_exit_menu(self.saveStatus, self.loadButtonPress, self.exit)
         else:
-            self.dialog.hide_exit_menu()
-            self.dialog.hide_load_menu()
-            self.setState(STATE_PLAY)
+            if self.dialog.exit_load_visible():
+                self.dialog.hide_exit_menu()
+                self.dialog.hide_load_menu()
+                self.setState(STATE_PLAY)
 
 
     def exit(self):
@@ -140,7 +142,7 @@ class Game():
         Config = SafeConfigParser()
         Config.add_section("GAME")
         Config.set("GAME", "quest", str(self._quest))
-        Config.set("GAME", "state", str(self._state))
+        Config.set("GAME", "state", str(self._old_state))
         Config.set("GAME", "secState", str(self._secState))
         Config.add_section("PLAYABLE_AGENTS")
         for a in self.agentManager.playableAgent:
@@ -164,7 +166,6 @@ class Game():
         Config = SafeConfigParser()
         cfg = open("./conf", "w")
         cfg.close()
-        self.exit()
 
     def loadButtonPress(self):
         list = []
@@ -186,37 +187,41 @@ class Game():
         config = SafeConfigParser()
         config.read(name)
         try:
-            if config.has_section("GAME"):
-                self._quest = config.getint("GAME", "quest")
-                self._state =config.getint("GAME", "state")
-                self._secState = config.get("GAME", "secState")
-                if self._secState != "None":
-                    self._secState = int(self._secState)
-            if config.has_section("PLAYABLE_AGENTS"):
-                for l in config.options("PLAYABLE_AGENTS"):
-                    name = "{:s}:{:s}".format(l.split('_')[0].upper(), l.split('_')[1])
-                    a = self.agentManager.getAgentByName(name)
-                    params = config.get("PLAYABLE_AGENTS", l).split(';')
-                    if a != None:
-                        a.health = int(params[0])
-                        a.magic = int(params[1])
-                        l = a.agent.getLocation()
-                        l.setLayerCoordinates(fife.ModelCoordinate(*(int(float(params[2])), int(float(params[3])))))
-                        a.agent.setLocation(l)
-                        a._mode = int(params[4])
-                    self.agentManager.addNewPlayableAgent(name)
-            if config.has_section("BEES"):
-                for l in config.options("BEES"):
-                    name = "{:s}:{:s}:{:s}".format(l.split('_')[0].upper(), l.split('_')[1], l.split('_')[2])
-                    b = self.agentManager.getAgentByName(name)
-                    params = config.get("BEES", l).split(';')
-                    if b != None:
-                        l = fife.Location(self.world.map.getLayer('TechdemoMapGroundObjectLayer'))
-                        l.setLayerCoordinates(fife.ModelCoordinate(*(int(float(params[0])), int(float(params[1])))))
-                        b.agent.setLocation(l)
-                        b.state = int(params[2])
-                        b.mode = int(params[3])
-                        b.start()
+            if config.sections() != []:
+                if config.has_section("GAME"):
+                    self._quest = config.getint("GAME", "quest")
+                    self.setState(config.getint("GAME", "state"))
+                    self._secState = config.get("GAME", "secState")
+                    if self._secState != "None":
+                        self._secState = int(self._secState)
+                if config.has_section("PLAYABLE_AGENTS"):
+                    self.agentManager.reset()
+                    for l in config.options("PLAYABLE_AGENTS"):
+                        name = "{:s}:{:s}".format(l.split('_')[0].upper(), l.split('_')[1])
+                        a = self.agentManager.getAgentByName(name)
+                        params = config.get("PLAYABLE_AGENTS", l).split(';')
+                        if a != None:
+                            a.health = int(params[0])
+                            a.magic = int(params[1])
+                            l = a.agent.getLocation()
+                            l.setLayerCoordinates(fife.ModelCoordinate(*(int(float(params[2])), int(float(params[3])))))
+                            a.agent.setLocation(l)
+                            a._mode = int(params[4])
+                        self.agentManager.addNewPlayableAgent(name)
+                if config.has_section("BEES"):
+                    for l in config.options("BEES"):
+                        name = "{:s}:{:s}:{:s}".format(l.split('_')[0].upper(), l.split('_')[1], l.split('_')[2])
+                        b = self.agentManager.getAgentByName(name)
+                        params = config.get("BEES", l).split(';')
+                        if b != None:
+                            l = fife.Location(self.world.map.getLayer('TechdemoMapGroundObjectLayer'))
+                            l.setLayerCoordinates(fife.ModelCoordinate(*(int(float(params[0])), int(float(params[1])))))
+                            b.agent.setLocation(l)
+                            b.state = int(params[2])
+                            b.mode = int(params[3])
+                            b.start()
+                self.dialog.hide_exit_menu()
+                self.dialog.hide_load_menu()
         except AttributeError as e:
             print "###################################################################################"
             print "Unexpected error:", sys.exc_info()[0]
@@ -225,8 +230,6 @@ class Game():
             print "--- Please, restart again the game ---"
             print "###################################################################################"
             self.deleteStatus()
-        self.setState(STATE_PLAY)
-        self.dialog.hide_exit_menu()
 
     """
         This function set the current state: if it's STATE_PAUSE it shows the PAUSE label below the
@@ -260,15 +263,19 @@ class Game():
     def onMoveButtonPress(self):
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
-            self.agentManager.getActiveAgent.run(self.dialog.instancemenu.instance.getLocationRef())
+            self.agentManager.getActiveAgent().run(self.dialog.instancemenu.instance.getLocationRef())
 
     def onKickButtonPress(self):
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
-            self.agentManager.getActiveAgent().kick(self.dialog.instancemenu.instance.getLocationRef())
-            target = self.agentManager.getAgentFromId(self.dialog.instancemenu.instance.getFifeId())
-            if target != None:
-                target.onKick()
+            activeAgent = self.agentManager.getActiveInstance()
+            instance = self.dialog.instancemenu.instance
+            target_distance = activeAgent.getLocationRef().getLayerDistanceTo(instance.getLocationRef())
+            if target_distance < 2:
+                self.agentManager.getActiveAgent().kick(self.dialog.instancemenu.instance.getLocationRef())
+                target = self.agentManager.getAgentFromId(instance.getFifeId())
+                if target != None:
+                    target.onKick()
 
     def onInspectButtonPress(self):
         if self._state == STATE_PLAY:
@@ -309,7 +316,7 @@ class Game():
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
             instance = self.dialog.instancemenu.instance
-            self.agentManager.getActiveAgent().talk(instance)
+            self.agentManager.getActiveAgent().talk(instance.getLocationRef())
             if instance.getObject().getId() == 'beekeeper':
                 beekeeperTexts = TDS.get("rio", "beekeeperTexts")
                 if self._secState == STATE_WARRIOR2:
@@ -354,15 +361,17 @@ class Game():
                     self.agentManager.wizard.say(wizardTexts[3])
             if instance.getObject().getId() == 'chemist':
                 chemistTexts = TDS.get("rio", "chemistTexts")
-                if self._quest == 1:
-                    self.agentManager.chemist.say(chemistTexts[0])
-                elif self._quest == 2:
-                    if self._secState == STATE_WIZARD1:
+                if self._quest == 2:
+                    if self._secState == STATE_WIZARD1 and self.agentManager.getActiveAgent().agentName == "PC:wizard":
                         self.setState(STATE_PAUSE)
                         wizardTexts = TDS.get("rio", "wizardTexts")
                         self.agentManager.wizard.say(wizardTexts[4])
                         t = Timer(2.5, self.chem1)
                         t.start()
+                    else:
+                        self.agentManager.chemist.say(chemistTexts[0])
+                else:
+                    self.agentManager.chemist.say(chemistTexts[0])
             if instance.getObject().getId() == 'bee':
                 beeTexts = TDS.get("rio", "beeTexts")
                 self.agentManager.getAgentFromId(instance.getFifeId()).say(beeTexts)
@@ -413,11 +422,14 @@ class Game():
     """
         Handle the toggle agent functionality.
     """
-    def onFacePressed(self, face_button):
+    def onFacePress(self):
         if self._state == STATE_PLAY:
-            self.agentManager.toggleAgent(self.world, face_button)
+            self.agentManager.toggleAgent(self.world, self.face_button)
             self.setHealth()
             self.setMagic()
+
+    def setFaceButton(self, face_button):
+        self.face_button = face_button
 
     """
         Display the hint dialog.
@@ -485,17 +497,16 @@ class Game():
         if target_distance > 5.0:
             buttons.append('moveButton')
         else:
-            if self.instance_to_agent.has_key(fife_id):
+            if self.instance_to_agent.has_key(fife_id) and id != "sword_crate":
                 buttons.append('talkButton')
-                if ((id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3) and self.agentManager.getActiveAgent().agentName == "PC:boy"
-                     and self._secState == STATE_WARRIOR2):
-                    buttons.append('kickButton')
 
         if self._quest == 1:
             if id == "sword_crate" and self._secState == STATE_BEE1:
                 buttons.append("openButton")
+            if ((id[:-2] != "NPC:bee:" or int(id[-2:]) <= 3) and self.agentManager.getActiveAgent().agentName == "PC:boy"
+                     and self._secState == STATE_WARRIOR2):
+                    buttons.append('kickButton')
         elif self._quest == 2:
-            print "secState: ", self._secState
             print "STATE_BEE2: ", STATE_BEE2
             if (self._secState == STATE_BEE2 and self.agentManager.getActiveAgent().agentName == "PC:warrior"
                 and id[:-2] == "NPC:bee:" and int(id[-2:]) >= 4 and target_distance < 4.0):
