@@ -1,0 +1,112 @@
+I added to the original game a quest system and some new characters and features.
+
+QUEST 1:
+    - Speak with the warrior
+    - Find him a new sword
+        - speak with the beekeper
+        - bring back his bees
+            - kick the bees to get them follow you
+            - run near the beekeper
+            - you only need to bring back the 3 bees near the lake
+        - speak again with the beekeper
+        - take the sword from inside the crate
+QUEST 2:
+    - Free the wizard
+        - use the warrior to kill the bees
+        - speak with the wizard
+    - Get a spell from the chemist
+        - speak to the chemist controlling the wizard
+QUEST 3:
+    - Reach the shrine in the center of the map
+        - Use the wizard's spell to burn the trees
+        - When you arrive near the shrine activate it
+
+You must do those stuff in the right sequence and with the right character (eg. speaking with the chemist
+with the boy won't get you the spell and you can't kick the bees before talking with the warrior and the 
+beekeper)
+
+-----------------------------------------------------------------------------------------------------------
+### AGENTS ###
+
+I added two new playable characters: the warrior and the wizard. At the beginning you can control only the
+boy and the girl but during the quests you'll get the control of the other two. 
+
+- Warrior
+    For the warrior I created with GIMP two sets of images. At the beginning he's without sword and after
+    completing the first quest he gets a sword and a shield. To do this there are different images for
+    running and standing with or without weapons. Attacking is possible only after getting the sword so
+    for that action there is only one set of images.
+- Bees
+    There are two groups of images, differentiated by their ID.
+    The first three are near the beekeper and can be kicked: this action'll make them following you. If
+    they arrive too near to you they'll attack and you'll loose some health. Every time in the
+    onInstanceActionFinished handler they check if they are near the beekeper: in this case they stop
+    following the hero and start moving randomly near the beeboxes.
+    The other four can be attacked by the warrior: after being hit they will fall and lie on the ground.
+    All the bees moves randomly inside a small area near their initial position or near the beeboxes.
+    When they moves randomly they're very slow but their speed increases when kicked.
+- Wizard
+    I renamed the hippie_priest as wizard. It's now a playable character and when he cast a spell he
+    creates a fireball wich is useful to burn the trees.
+- Fireball
+    For the fireball I created with GIMP the 8 images (for each orientation) for when it's flying and for
+    the explosion. Stand's images are empty so when the fireball is not being used it's invisible.
+    This agent has three action, wich are stand, fly and explosion. There are 4 fireballs in the map, so
+    it's possible to cast another spell when the first one is not yet finished.
+    Sometimes the fly action fails because there are no free path from the current position to the target;
+    to fix this problem immediately before the explosion the agent position is set to the target location.
+    In this way you can't see the fireball flying there but you'll only see the explosion.
+- Crate
+    This crate is near the beekeper. At the beginning it's closed and you can only inspect it. When all
+    the bees are back near the beeboxes it'll be possible to open it and get the sword and the shield 
+    inside.
+
+-----------------------------------------------------------------------------------------------------------
+### CODE ###
+
+I created some new classes to write a more modular code. I tryed to separate the code related to the
+agents, the game status and the dialogs.
+
+- Game
+    The main purpose of this class is keep the game status. Inside there's a state machine which decide
+    accordingly to the current status which are the available actions.
+    
+
+    @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ ToDO @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ 
+
+- AgentManager
+    This class initialize all agents and keep a reference to them. It contains a list of all the playable
+    characters so it's able to toggle the active agent.
+    It also contains methods to get all the agents and get the agent corresponding to a specific id.
+    There are two methods 'beesAtHome' and 'BeesDead' which check if all the bees are near the beeboxes
+    of if they're all dead.
+- Agent
+    Every agent class inherits from this class. Here are set the properties and methods common to each
+    agent like 'say()' and 'health'. Two useful methods are 'getX()' and 'getY()' which returns the
+    agent's coordinates.
+- Dialog
+    This class shows and hides the instancemenu and the status dialog. The instancemenu's buttons are
+    choosen by the Game class because they depend on the agent and the game's state. 
+
+-----------------------------------------------------------------------------------------------------------
+### GAME ###
+
+- Dialogs
+    At the beginning of each quest or when you click on the hint button a popup will appear with the
+    current quest's objectives and hints.
+- Health bar
+    Immediately below the player image in the top-left corner of the screen you can see the health bar.
+    This bar changes color accordingly to the health percentage of the current character. The only way to
+    loose height is by being attacked by the bees.
+- Status label
+    Below the player image there is a label PAUSE which appears when the game is paused, which usually
+    means that you are speacking with someone or you're reading the quest instructions. Until the end of
+    the dialog or the closing of the dialog you cannot move the characters: all your clicks will be
+    ignored.
+
+-----------------------------------------------------------------------------------------------------------
+### ADDITIONS ###
+
+- Tests
+- Play game from quest N
+- Git

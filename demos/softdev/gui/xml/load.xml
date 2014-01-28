@@ -1,0 +1,4 @@
+<Window title="Load" size="300,150">
+    <Container size="208,264" name="cont">
+    </Container>
+</Window>
