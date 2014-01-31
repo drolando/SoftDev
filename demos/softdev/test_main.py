@@ -53,7 +53,6 @@ class MyTests(unittest.TestCase):
         self.failUnless(self.game.agentManager != None)
 
 def main():
-    print dir(unittest.runner)
     unittest.main()
 
 if __name__ == '__main__':

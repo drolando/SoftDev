@@ -45,7 +45,6 @@ from fife.extensions.fife_settings import Setting
 from fife.extensions.fife_utils import getUserDataDirectory
 
 settings_path = os.path.expanduser(os.path.join('~', '.fife', 'rio_de_hola'))
-print settings_path
 if os.path.isdir(settings_path):
     os.remove(os.path.join(settings_path, 'settings.xml'))
 
@@ -95,7 +94,6 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
         keystr = evt.getKey().getAsString().lower()
         consumed = False
         if keyval == fife.Key.ESCAPE:
-            print "######################### keyPressed ##########################"
             #self.quit = True
             #consumed = True
             self.game.show_save_dialog()
@@ -106,7 +104,6 @@ class ApplicationListener(eventlistenerbase.EventListenerBase):
 
     def onCommand(self, command):
         if command.getCommandType() == fife.CMD_QUIT_GAME:
-            print "####################### onCommand ############################"
             self.quit = True
             consumed = True
             self.game.show_save_dialog()

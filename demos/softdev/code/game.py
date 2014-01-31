@@ -61,7 +61,8 @@ class Game():
             self.agentManager.getActiveAgent().health -= 10
             self.setHealth()
             if self.agentManager.getActiveAgent().health <= 0:
-                self.deleteStatus() #ToDO add message here!!!
+                self.deleteStatus()
+                self.dialog.show("Exit", "misc/game/game_over.txt", self.game_over)
         elif ev == EV_ACTION_FINISHED:
             pass
         elif ev == EV_BEE_ARRIVED:
@@ -79,7 +80,7 @@ class Game():
         elif ev == EV_SHRINE:
             self._state = STATE_END
             self._secState = STATE_END
-            self.dialog.show("Exit", "misc/game/end.txt", self.deleteStatus)
+            self.dialog.show("Exit", "misc/game/end.txt", self.end)
         else:
             print "Event not recognized: {}".format(ev)
 
@@ -106,8 +107,13 @@ class Game():
         self._quest = 3
         self.setState(STATE_PLAY)
         self._secState = STATE_WIZARD2
-        #ToDo remove this
-        self.agentManager.addNewPlayableAgent("PC:wizard")
+
+    def game_over(self):
+        self.exit()
+
+    def end(self):
+        self.deleteStatus()
+        self.exit()
 
     """
         The following functions allow the user to save, load and delete the game status.
@@ -126,6 +132,7 @@ class Game():
 
 
     def exit(self):
+        self.agentManager.destroy()
         cmd = fife.Command()
         cmd.setSource(None)
         cmd.setCommandType(fife.CMD_QUIT_GAME)
@@ -230,6 +237,7 @@ class Game():
             print "--- Please, restart again the game ---"
             print "###################################################################################"
             self.deleteStatus()
+            self.exit()
 
     """
         This function set the current state: if it's STATE_PAUSE it shows the PAUSE label below the
@@ -270,12 +278,14 @@ class Game():
             self.dialog.hide_instancemenu()
             activeAgent = self.agentManager.getActiveInstance()
             instance = self.dialog.instancemenu.instance
-            target_distance = activeAgent.getLocationRef().getLayerDistanceTo(instance.getLocationRef())
-            if target_distance < 2:
+            target_distance = activeAgent.getLocation().getLayerDistanceTo(instance.getLocation())
+            if target_distance < 3:
                 self.agentManager.getActiveAgent().kick(self.dialog.instancemenu.instance.getLocationRef())
                 target = self.agentManager.getAgentFromId(instance.getFifeId())
                 if target != None:
                     target.onKick()
+            else:
+                activeAgent.say("Too far...", 2000)
 
     def onInspectButtonPress(self):
         if self._state == STATE_PLAY:
@@ -296,8 +306,14 @@ class Game():
     def onAttackButtonPress(self):
         if self._state == STATE_PLAY:
             self.dialog.hide_instancemenu()
-            self.agentManager.warrior.attack(self.dialog.instancemenu.instance.getLocationRef())
-            self.agentManager.getAgentFromId(self.dialog.instancemenu.instance.getFifeId()).onAttack()
+            activeAgent = self.agentManager.getActiveInstance()
+            instance = self.dialog.instancemenu.instance
+            target_distance = activeAgent.getLocation().getLayerDistanceTo(instance.getLocation())
+            if target_distance < 3:
+                self.agentManager.warrior.attack(instance.getLocationRef())
+                self.agentManager.getAgentFromId(instance.getFifeId()).onAttack()
+            else:
+                activeAgent.say("Too far...", 2000)
 
     def onSpellButtonPress(self):
         if self._state == STATE_PLAY:
@@ -507,7 +523,6 @@ class Game():
                      and self._secState == STATE_WARRIOR2):
                     buttons.append('kickButton')
         elif self._quest == 2:
-            print "STATE_BEE2: ", STATE_BEE2
             if (self._secState == STATE_BEE2 and self.agentManager.getActiveAgent().agentName == "PC:warrior"
                 and id[:-2] == "NPC:bee:" and int(id[-2:]) >= 4 and target_distance < 4.0):
                 buttons.append('attackButton')

@@ -47,11 +47,11 @@ boy and the girl but during the quests you'll get the control of the other two.
     When they moves randomly they're very slow but their speed increases when kicked.
 - Wizard
     I renamed the hippie_priest as wizard. It's now a playable character and when he cast a spell he
-    creates a fireball wich is useful to burn the trees.
+    creates a fireball which is useful to burn the trees.
 - Fireball
     For the fireball I created with GIMP the 8 images (for each orientation) for when it's flying and for
     the explosion. Stand's images are empty so when the fireball is not being used it's invisible.
-    This agent has three action, wich are stand, fly and explosion. There are 4 fireballs in the map, so
+    This agent has three action, which are stand, fly and explosion. There are 4 fireballs in the map, so
     it's possible to cast another spell when the first one is not yet finished.
     Sometimes the fly action fails because there are no free path from the current position to the target;
     to fix this problem immediately before the explosion the agent position is set to the target location.
@@ -70,10 +70,13 @@ agents, the game status and the dialogs.
 - Game
     The main purpose of this class is keep the game status. Inside there's a state machine which decide
     accordingly to the current status which are the available actions.
-    
-
-    @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ ToDO @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ @@@@@@@@ 
-
+    In this class there are the methods to save and load the game status: all the useful parameters are
+    written in a file called conf (which contains a copy of the last saved state) and in files inside
+    the saves folder.
+    I tryed to make all classes as much separated as possible: the (almost) only function of Game which is
+    called from the other classes is 'event()', so it's possible to change the internal structure of Game
+    without having to change other parts of the code.
+    In this class there are also most of the UI callbacks.
 - AgentManager
     This class initialize all agents and keep a reference to them. It contains a list of all the playable
     characters so it's able to toggle the active agent.
@@ -101,12 +104,43 @@ agents, the game status and the dialogs.
 - Status label
     Below the player image there is a label PAUSE which appears when the game is paused, which usually
     means that you are speacking with someone or you're reading the quest instructions. Until the end of
-    the dialog or the closing of the dialog you cannot move the characters: all your clicks will be
-    ignored.
+    the dialog or the closure of the popup window you cannot move the characters: all your clicks 
+    will be ignored.
+- Save & Load
+    When the quit button is clicked or you press thw ESC key a menu will appear. It has 3 different
+    options: save, load and exit. With save it's possible to save the game state in a file: the same
+    parameters will be written also in the file conf so the next time that you launch the game you'll
+    start from that point.
+    If you choose the load option, a new menu will appear with the list af the last 5 saves plus the three
+    default saves that correspond to the beginning of each quest. When you choose one of this saves the
+    game'll be set to that particular state: all characters (including the bees) will be positioned in
+    their last position and they'll start acting as before.
+    With the exit button instead you'll exit the game without saving.
 
 -----------------------------------------------------------------------------------------------------------
 ### ADDITIONS ###
 
 - Tests
-- Play game from quest N
+    I also added some unit tests to the game. They're not part of the game code or really useful but I
+    added them to learn how to write tests in python and how to use the MagicMock library.
+    To run them it's enough executing "python test_main.py" from the demos/softdev folder. The real
+    implementation is in a file called test_game.py inside the code folder.
 - Git
+    To keep track of all versions of my game and sometimes to rollback when I made some mistakes I used
+    git. In the submitted archive there is also the .git folder, so it's possible to see the versions
+    history.
+    The remote repository is hosted on bitbucket and will be made public since the 1st of February, 2014
+    with the following url: https://bitbucket.org/drolando/softdev
+
+-----------------------------------------------------------------------------------------------------------
+### PROBLEMS ###
+
+- Deletion problem
+    Sometimes when you destroy the trees the agents are not able to cross the cell previously occupied by
+    the tree. If you get this error save the game, close it and launch it again.
+    I tryed to fix this bug but it seems to be a bug of FIFE ENGINE. I'm using their function
+    'layer.deleteInstance()', moving the trees in the right position only after initializing the agents
+    and I also modified the shrine.xml as written on their forum to use 'narrow cells' and static cells
+    but it's not enough.
+
+

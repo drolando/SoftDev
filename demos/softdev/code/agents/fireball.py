@@ -27,7 +27,7 @@ class Fireball(Agent):
             self.idle()
 
     def onInstanceActionCancelled(self, instance, action):
-        print "Fireball: onInstanceActionCancelled"
+        pass
 
     def getNextWaypoint(self):
         self.waypoint_counter += 1

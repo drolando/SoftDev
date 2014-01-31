@@ -5,7 +5,6 @@ from fireball import Fireball
 from threading import Timer
 from fife.extensions.soundmanager import SoundManager
 
-#TDS = Setting(app_name="rio_de_hola")
 
 _STATE_NONE, _STATE_IDLE, _STATE_RUN, _STATE_FOLLOW = 0, 1, 2, 3
 
@@ -24,7 +23,7 @@ class Wizard(Agent):
             fireball = Fireball(settings, model, 'NPC:fireball:0{}'.format(i), layer)
             fireball.start()
             self.fireballs.append(fireball)
-        self.health = 65
+        self.health = 100
         self.magic = 100
         self.layer = layer
         
@@ -34,7 +33,7 @@ class Wizard(Agent):
         self.t = Timer(1, self.addMagic)
         self.t.start()
 
-        self.soundmanager = SoundManager(model.engine)
+        self.onDestroy = False
 
     def onInstanceActionFinished(self, instance, action):
         if self.state == _STATE_FOLLOW:
@@ -70,15 +69,8 @@ class Wizard(Agent):
             if self.t == None:
                 self.addMagic()
 
-            '''self.music = self.soundmanager.createSoundEmitter('/home/daniele/Documents/SoftDev/sdproject/demos/softdev/code/agents/fire.ogg')
-            self.music.looping = True
-            self.music.gain = 128 # volume: da 0 a 255
-
-            self.music.play()'''
-
-
     def addMagic(self):
-        if self.magic < 100:
+        if self.onDestroy == False and self.magic < 100:
             self.magic += 2
             self.game.setMagic()
             self.t = Timer(1, self.addMagic)
@@ -91,3 +83,4 @@ class Wizard(Agent):
             self.t.cancel()
         self.magic = 100
         self.t = None
+        self.onDestroy = True

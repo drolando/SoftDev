@@ -38,14 +38,12 @@ class Bee(Agent):
                 self.attack()
         elif self.state == _STATE_ATTACK:
             self.follow_hero()
-            #self.rand(self.getNextWaypoint())
         elif self.state == _STATE_DEAD:
             self.agent.actOnce("dead")
             
     def start(self):
         if self.nearBeeBoxes() == True:
             self.rand(self.getNextWaypoint())
-            #self.game.event(code.game.EV_BEE_ARRIVED)
         else:
             self.onInstanceActionFinished()
 
@@ -57,17 +55,14 @@ class Bee(Agent):
         return l
 
     def follow_hero(self):
-        print "follow"
         self.state = _STATE_FOLLOW
         self.agent.follow('fly', self.agentManager.getActiveInstance(), self.BEE_SPEED_FAST)
 
     def run(self, location):
-        print "run"
         self.state = _STATE_RUN
         self.agent.move('fly', location, self.BEE_SPEED_FAST)
 
     def rand(self, location):
-        print "rand"
         self.state = _STATE_RAND
         self.agent.move('fly', location, self.BEE_SPEED_NORMAL)
 
@@ -87,7 +82,6 @@ class Bee(Agent):
         self.game.event(code.game.EV_HIT)
 
     def nearBeeBoxes(self):
-        print "nearBeeBoxes ", self.getX(), " ", self.getY()
         if self.getX() >= -48 and self.getX() <= -32 and self.getY() >= -40 and self.getY() <= -26:
             self.min_x = -48
             self.max_x = -32

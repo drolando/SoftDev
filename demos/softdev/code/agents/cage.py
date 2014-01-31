@@ -16,7 +16,7 @@ class Cage(Agent):
     def onInstanceActionFinished(self, instance, action):
         if self.state == _STATE_OPENING:
             self.game.event(code.game.EV_QUEST_2)
-            self.stand()
+            #self.stand()
         elif self.state == _STATE_OPEN:
             self.stand()
 

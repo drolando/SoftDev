@@ -5778,7 +5778,6 @@
 <i x="-30.0" o="trees:05" id="tree:224" z="0.0" y="-30.0" r="0"></i>
 <i x="-30.0" o="trees:05" id="tree:225" z="0.0" y="-30.0" r="0"></i>
 
-<i x="10.0" o="girl" y="11.0" r="0" id="PC:girl" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 <i x="46.0" o="priest_hut" z="0.0" y="18.0" r="180"></i>
 <i x="42.0" o="trees:06" z="0.0" y="16.0" r="0"></i>
 <i x="42.0" o="trees:06" z="0.0" y="14.0" r="0"></i>
@@ -6088,6 +6087,8 @@
 <i x="41.0" o="dummy" z="10.0" id="NPC:dummy" y="19.0" r="180"></i>
 
 <i x="43.0" o="warrior" y="-20.0" r="0" id="PC:warrior" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
+<i x="37.0" o="boy" y="-20.0" r="0" id="PC:boy" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
+<i x="36.0" o="girl" y="-21.0" r="0" id="PC:girl" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 
 <i x="-17.0" o="bee" z="0.0" y="-9.0" r="180" id="NPC:bee:01"></i>
 <i x="-15.0" o="bee" z="0.0" y="-11.0" r="180" id="NPC:bee:02"></i>
@@ -6127,7 +6128,6 @@
 <i x="-40.0" o="beekeeper" z="0.0" y="-31.0" r="180"></i>
 <i x="-36.0" o="empty_lid" z="0.0" y="-31.0" r="180" id="sword_crate"></i>
 
-<i x="-34.0" o="boy" y="-30.0" r="0" id="PC:boy" z="0.0" visitor_radius="6" visitor_shape="circle"></i>
 
 <i x="-19.0" o="beach_bar" z="0.0" y="2.0" r="180"></i>
 </instances>
