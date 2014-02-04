@@ -9,20 +9,20 @@ _\/\\\__________________\/\\\______\/\\\______________\/\\\_____________
 _\/\\\_______________/\\\\\\\\\\\__\/\\\______________\/\\\\\\\\\\\\\\\_
 _\///_______________\///////////___\///_______________\///////////////__
 ```
-SOFTDEV GAME v2.0 - [![Build Status](https://bitbucket.org/drolando/softdev?branch=master)](https://bitbucket.org/drolando/softdev)
+SOFTDEV GAME v2.0 - [![Build Status](https://travis-ci.org/fifengine/fifengine.png?branch=master)](https://bitbucket.org/drolando/softdev)
 ------------
 
 INSTALL
 ------------
-sudo apt-get install build-essential git cmake
-sudo apt-get install libsdl1.2-dev libsdl-ttf2.0-dev libsdl-image1.2-dev
-sudo apt-get install libboost-all-dev libboost-python-dev
-sudo apt-get install libvorbis-dev libogg-dev libopenal-dev
-sudo apt-get install libgl1-mesa-dev
-sudo apt-get install swig
-sudo apt-get install zlib1g-dev
-sudo apt-get install scons
-sudo apt-get install liballegro4.2-dev
+sudo apt-get install build-essential git cmake\\
+sudo apt-get install libsdl1.2-dev libsdl-ttf2.0-dev libsdl-image1.2-dev\\
+sudo apt-get install libboost-all-dev libboost-python-dev\\
+sudo apt-get install libvorbis-dev libogg-dev libopenal-dev\\
+sudo apt-get install libgl1-mesa-dev\\
+sudo apt-get install swig\\
+sudo apt-get install zlib1g-dev\\
+sudo apt-get install scons\\
+sudo apt-get install liballegro4.2-dev\\
 
 Install fifechan:
 git clone https://github.com/fifengine/fifechan.git
